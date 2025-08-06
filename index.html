@@ -1003,20 +1003,876 @@
         
         // Load calculator for specific journey
         function loadCalculatorForJourney(journey) {
-            // This would load the appropriate calculator form
-            // For now, just showing a placeholder
-            document.getElementById('calculatorForm').innerHTML = `
-                <h3>Calculator for: ${journey}</h3>
-                <p>Full calculator implementation would go here...</p>
-                <p>This would include all the form fields from the previous version, 
-                   pre-configured based on the journey type selected.</p>
-            `;
+            // Store journey type
+            window.selectedJourney = journey;
+            
+            // Load the full calculator form
+            document.getElementById('calculatorForm').innerHTML = getCalculatorHTML(journey);
+            
+            // Initialize form handlers
+            initializeCalculatorHandlers();
+            
+            // Pre-fill based on journey type
+            prefillByJourney(journey);
         }
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Any initialization code
         });
+        
+        // Get calculator HTML based on journey
+        function getCalculatorHTML(journey) {
+            const journeyTitles = {
+                'dreaming': 'Planning Your Journey to Canada',
+                'studying': 'From Student to Permanent Resident',
+                'working': 'Leveraging Your Canadian Experience'
+            };
+            
+            return `
+                <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                    <!-- Progress Bar -->
+                    <div style="background: #f7fafc; padding: 30px; border-bottom: 2px solid #e2e8f0;">
+                        <h3 style="text-align: center; color: #2d3748; margin-bottom: 20px;">${journeyTitles[journey] || 'Calculate Your CRS Score'}</h3>
+                        <div style="display: flex; justify-content: space-between; max-width: 600px; margin: 0 auto; position: relative;">
+                            <div style="position: absolute; top: 20px; left: 0; right: 0; height: 2px; background: #e2e8f0; z-index: 1;"></div>
+                            <div style="position: absolute; top: 20px; left: 0; height: 2px; background: #667eea; z-index: 2; transition: width 0.5s;" id="progressBar"></div>
+                            
+                            <div class="progress-step active" data-step="1" style="text-align: center; position: relative; z-index: 3;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #667eea; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 600;">1</div>
+                                <div style="font-size: 0.85em; color: #718096;">Personal</div>
+                            </div>
+                            <div class="progress-step" data-step="2" style="text-align: center; position: relative; z-index: 3;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #e2e8f0; color: #718096; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 600;">2</div>
+                                <div style="font-size: 0.85em; color: #718096;">Education</div>
+                            </div>
+                            <div class="progress-step" data-step="3" style="text-align: center; position: relative; z-index: 3;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #e2e8f0; color: #718096; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 600;">3</div>
+                                <div style="font-size: 0.85em; color: #718096;">Language</div>
+                            </div>
+                            <div class="progress-step" data-step="4" style="text-align: center; position: relative; z-index: 3;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #e2e8f0; color: #718096; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 600;">4</div>
+                                <div style="font-size: 0.85em; color: #718096;">Experience</div>
+                            </div>
+                            <div class="progress-step" data-step="5" style="text-align: center; position: relative; z-index: 3;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #e2e8f0; color: #718096; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 600;">5</div>
+                                <div style="font-size: 0.85em; color: #718096;">Results</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Steps -->
+                    <div style="padding: 40px;">
+                        <!-- Step 1: Personal Information -->
+                        <div class="form-step active" data-step="1">
+                            <h3 style="color: #2d3748; margin-bottom: 25px;">Personal Information</h3>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">Date of Birth</label>
+                                    <input type="date" id="calc_dob" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                    <div style="font-size: 0.85em; color: #718096; margin-top: 5px;">Maximum points between ages 20-29</div>
+                                </div>
+                                
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">Marital Status</label>
+                                    <select id="calc_marital" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                        <option value="single">Single</option>
+                                        <option value="married">Married/Common-law</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="spouseInfo" style="display: none; margin-top: 30px; padding: 25px; background: #f7fafc; border-radius: 12px;">
+                                <h4 style="color: #2d3748; margin-bottom: 20px;">Spouse Information</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">Spouse's Education</label>
+                                        <select id="calc_spouse_edu" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; background: white;">
+                                            <option value="none">High school or less</option>
+                                            <option value="diploma">Diploma/Certificate (1-2 years)</option>
+                                            <option value="bachelor">Bachelor's degree</option>
+                                            <option value="master">Master's or PhD</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">Spouse's English Level</label>
+                                        <select id="calc_spouse_english" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; background: white;">
+                                            <option value="0">No English test</option>
+                                            <option value="4">CLB 4-5 (Basic)</option>
+                                            <option value="6">CLB 6 (Moderate)</option>
+                                            <option value="7">CLB 7-8 (Good)</option>
+                                            <option value="9">CLB 9+ (Excellent)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">Spouse's Canadian Work Experience</label>
+                                        <select id="calc_spouse_work" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; background: white;">
+                                            <option value="0">None</option>
+                                            <option value="1">1 year</option>
+                                            <option value="2">2 years</option>
+                                            <option value="3">3+ years</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: Education -->
+                        <div class="form-step" data-step="2" style="display: none;">
+                            <h3 style="color: #2d3748; margin-bottom: 25px;">Education</h3>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">Highest Education Level</label>
+                                    <select id="calc_education" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                        <option value="none">High school or less</option>
+                                        <option value="diploma1">1-year diploma/certificate</option>
+                                        <option value="diploma2">2-year diploma</option>
+                                        <option value="bachelor">Bachelor's degree (3+ years)</option>
+                                        <option value="two-or-more">Two or more degrees</option>
+                                        <option value="master">Master's degree</option>
+                                        <option value="phd">PhD</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">Canadian Education?</label>
+                                    <select id="calc_canadian_edu" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                        <option value="no">No Canadian education</option>
+                                        <option value="1-2year">1-2 year Canadian diploma</option>
+                                        <option value="3year">3+ year Canadian degree</option>
+                                    </select>
+                                    <div style="font-size: 0.85em; color: #718096; margin-top: 5px;">Canadian education gives bonus points!</div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-box" style="background: #edf2f7; border-left: 4px solid #4299e1; padding: 20px; margin-top: 30px; border-radius: 8px;">
+                                <h4 style="color: #2d3748; margin-bottom: 10px;">📚 Education Tips</h4>
+                                <p style="color: #4a5568; line-height: 1.6;">
+                                • Foreign degrees need an ECA (Educational Credential Assessment)<br>
+                                • Canadian education gives 15-30 bonus points<br>
+                                • Two degrees are better than one longer degree for points
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Language -->
+                        <div class="form-step" data-step="3" style="display: none;">
+                            <h3 style="color: #2d3748; margin-bottom: 25px;">Language Skills</h3>
+                            
+                            <div style="margin-bottom: 30px;">
+                                <h4 style="color: #4a5568; margin-bottom: 15px;">English Proficiency</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">English Level (CLB)</label>
+                                        <select id="calc_english" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                            <option value="0">No test / Below CLB 4</option>
+                                            <option value="4">CLB 4</option>
+                                            <option value="5">CLB 5</option>
+                                            <option value="6">CLB 6</option>
+                                            <option value="7">CLB 7 (IELTS 6.0 all)</option>
+                                            <option value="8">CLB 8</option>
+                                            <option value="9">CLB 9 (IELTS 7+)</option>
+                                            <option value="10">CLB 10</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 30px;">
+                                <h4 style="color: #4a5568; margin-bottom: 15px;">French Proficiency</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">French Level (NCLC)</label>
+                                        <select id="calc_french" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                            <option value="0">No French</option>
+                                            <option value="4">NCLC 4</option>
+                                            <option value="5">NCLC 5</option>
+                                            <option value="6">NCLC 6</option>
+                                            <option value="7">NCLC 7 (TEF B2)</option>
+                                            <option value="8">NCLC 8</option>
+                                            <option value="9">NCLC 9+</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-box" style="background: #f0fff4; border-left: 4px solid #48bb78; padding: 20px; margin-top: 30px; border-radius: 8px;">
+                                <h4 style="color: #2d3748; margin-bottom: 10px;">🎯 Language Bonus</h4>
+                                <p style="color: #4a5568; line-height: 1.6;">
+                                <strong>French + English = 50 bonus points!</strong><br>
+                                If you have NCLC 7+ in French AND CLB 5+ in English, you get a massive 50-point bonus. This is one of the best ways to boost your score!
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4: Work Experience -->
+                        <div class="form-step" data-step="4" style="display: none;">
+                            <h3 style="color: #2d3748; margin-bottom: 25px;">Work Experience</h3>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">Foreign Work Experience</label>
+                                    <select id="calc_foreign_work" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                        <option value="0">None</option>
+                                        <option value="1">1 year</option>
+                                        <option value="2">2 years</option>
+                                        <option value="3">3+ years</option>
+                                    </select>
+                                    <div style="font-size: 0.85em; color: #718096; margin-top: 5px;">Work experience outside Canada</div>
+                                </div>
+                                
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">Canadian Work Experience</label>
+                                    <select id="calc_canadian_work" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                        <option value="0">None</option>
+                                        <option value="1">1 year</option>
+                                        <option value="2">2 years</option>
+                                        <option value="3">3 years</option>
+                                        <option value="4">4 years</option>
+                                        <option value="5">5+ years</option>
+                                    </select>
+                                    <div style="font-size: 0.85em; color: #718096; margin-top: 5px;">Must be NOC TEER 0, 1, 2, or 3</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 30px;">
+                                <h4 style="color: #4a5568; margin-bottom: 15px;">Additional Factors</h4>
+                                <div style="display: grid; gap: 15px;">
+                                    <label style="display: flex; align-items: center; padding: 15px; background: #f7fafc; border-radius: 8px; cursor: pointer;">
+                                        <input type="checkbox" id="calc_sibling" style="margin-right: 10px; width: 20px; height: 20px;">
+                                        <span style="color: #4a5568;">I have a sibling who is a Canadian citizen or PR (15 points)</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; padding: 15px; background: #f7fafc; border-radius: 8px; cursor: pointer;">
+                                        <input type="checkbox" id="calc_pnp" style="margin-right: 10px; width: 20px; height: 20px;">
+                                        <span style="color: #4a5568;">I have a Provincial Nomination (600 points!)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 5: Results -->
+                        <div class="form-step" data-step="5" style="display: none;">
+                            <div id="calculationResults">
+                                <!-- Results will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div style="display: flex; justify-content: space-between; padding: 30px 40px; background: #f7fafc; border-top: 2px solid #e2e8f0;">
+                        <button onclick="previousStep()" id="prevBtn" style="padding: 14px 30px; background: white; color: #4a5568; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; display: none;">← Previous</button>
+                        <button onclick="nextStep()" id="nextBtn" style="padding: 14px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">Next →</button>
+                        <button onclick="calculateScore()" id="calcBtn" style="padding: 14px 30px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; display: none;">Calculate Score 🎯</button>
+                        <button onclick="resetCalculator()" id="resetBtn" style="padding: 14px 30px; background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; display: none;">Start Over</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Initialize calculator handlers
+        function initializeCalculatorHandlers() {
+            // Marital status change handler
+            const maritalSelect = document.getElementById('calc_marital');
+            if (maritalSelect) {
+                maritalSelect.addEventListener('change', function() {
+                    const spouseInfo = document.getElementById('spouseInfo');
+                    if (spouseInfo) {
+                        spouseInfo.style.display = this.value === 'married' ? 'block' : 'none';
+                    }
+                });
+            }
+            
+            // Set max date for DOB (must be at least 18)
+            const dobInput = document.getElementById('calc_dob');
+            if (dobInput) {
+                const maxDate = new Date();
+                maxDate.setFullYear(maxDate.getFullYear() - 18);
+                dobInput.max = maxDate.toISOString().split('T')[0];
+            }
+        }
+        
+        // Pre-fill based on journey
+        function prefillByJourney(journey) {
+            if (journey === 'studying') {
+                // Pre-select likely values for students
+                const eduSelect = document.getElementById('calc_education');
+                if (eduSelect) eduSelect.value = 'bachelor';
+                
+                const canEduSelect = document.getElementById('calc_canadian_edu');
+                if (canEduSelect) canEduSelect.value = '3year';
+                
+                const englishSelect = document.getElementById('calc_english');
+                if (englishSelect) englishSelect.value = '7';
+                
+            } else if (journey === 'working') {
+                // Pre-select likely values for workers
+                const workSelect = document.getElementById('calc_canadian_work');
+                if (workSelect) workSelect.value = '1';
+                
+                const englishSelect = document.getElementById('calc_english');
+                if (englishSelect) englishSelect.value = '8';
+            }
+        }
+        
+        // Step navigation
+        let currentCalcStep = 1;
+        
+        function nextStep() {
+            if (currentCalcStep < 5) {
+                // Hide current step
+                document.querySelector(`.form-step[data-step="${currentCalcStep}"]`).style.display = 'none';
+                document.querySelector(`.progress-step[data-step="${currentCalcStep}"] div`).style.background = '#48bb78';
+                
+                // Show next step
+                currentCalcStep++;
+                document.querySelector(`.form-step[data-step="${currentCalcStep}"]`).style.display = 'block';
+                document.querySelector(`.progress-step[data-step="${currentCalcStep}"] div`).style.background = '#667eea';
+                document.querySelector(`.progress-step[data-step="${currentCalcStep}"] div`).style.color = 'white';
+                
+                // Update progress bar
+                const progressBar = document.getElementById('progressBar');
+                if (progressBar) {
+                    progressBar.style.width = ((currentCalcStep - 1) / 4 * 100) + '%';
+                }
+                
+                // Update buttons
+                document.getElementById('prevBtn').style.display = 'inline-block';
+                if (currentCalcStep === 4) {
+                    document.getElementById('nextBtn').textContent = 'Calculate →';
+                }
+                if (currentCalcStep === 5) {
+                    document.getElementById('nextBtn').style.display = 'none';
+                    document.getElementById('calcBtn').style.display = 'none';
+                    document.getElementById('resetBtn').style.display = 'inline-block';
+                    calculateScore();
+                }
+            } else if (currentCalcStep === 4) {
+                // Move to results
+                document.querySelector(`.form-step[data-step="${currentCalcStep}"]`).style.display = 'none';
+                currentCalcStep = 5;
+                document.querySelector(`.form-step[data-step="${currentCalcStep}"]`).style.display = 'block';
+                document.querySelector(`.progress-step[data-step="${currentCalcStep}"] div`).style.background = '#667eea';
+                document.querySelector(`.progress-step[data-step="${currentCalcStep}"] div`).style.color = 'white';
+                document.getElementById('progressBar').style.width = '100%';
+                document.getElementById('nextBtn').style.display = 'none';
+                document.getElementById('calcBtn').style.display = 'none';
+                document.getElementById('resetBtn').style.display = 'inline-block';
+                calculateScore();
+            }
+        }
+        
+        function previousStep() {
+            if (currentCalcStep > 1) {
+                // Hide current step
+                document.querySelector(`.form-step[data-step="${currentCalcStep}"]`).style.display = 'none';
+                document.querySelector(`.progress-step[data-step="${currentCalcStep}"] div`).style.background = '#e2e8f0';
+                document.querySelector(`.progress-step[data-step="${currentCalcStep}"] div`).style.color = '#718096';
+                
+                // Show previous step
+                currentCalcStep--;
+                document.querySelector(`.form-step[data-step="${currentCalcStep}"]`).style.display = 'block';
+                
+                // Update progress bar
+                const progressBar = document.getElementById('progressBar');
+                if (progressBar) {
+                    progressBar.style.width = ((currentCalcStep - 1) / 4 * 100) + '%';
+                }
+                
+                // Update buttons
+                if (currentCalcStep === 1) {
+                    document.getElementById('prevBtn').style.display = 'none';
+                }
+                document.getElementById('nextBtn').style.display = 'inline-block';
+                document.getElementById('nextBtn').textContent = currentCalcStep === 4 ? 'Calculate →' : 'Next →';
+                document.getElementById('resetBtn').style.display = 'none';
+            }
+        }
+        
+        function resetCalculator() {
+            // Reset to step 1
+            document.querySelector(`.form-step[data-step="${currentCalcStep}"]`).style.display = 'none';
+            currentCalcStep = 1;
+            document.querySelector(`.form-step[data-step="1"]`).style.display = 'block';
+            
+            // Reset progress indicators
+            document.querySelectorAll('.progress-step div').forEach((step, index) => {
+                if (index === 0) {
+                    step.style.background = '#667eea';
+                    step.style.color = 'white';
+                } else {
+                    step.style.background = '#e2e8f0';
+                    step.style.color = '#718096';
+                }
+            });
+            
+            document.getElementById('progressBar').style.width = '0%';
+            
+            // Reset buttons
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').textContent = 'Next →';
+            document.getElementById('resetBtn').style.display = 'none';
+            
+            // Clear form
+            document.getElementById('calculatorForm').querySelectorAll('input, select').forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            });
+        }
+        
+        // Calculate CRS Score
+        function calculateScore() {
+            // Get all input values
+            const dob = new Date(document.getElementById('calc_dob').value);
+            const today = new Date();
+            const age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+            
+            const married = document.getElementById('calc_marital').value === 'married';
+            const education = document.getElementById('calc_education').value;
+            const canadianEdu = document.getElementById('calc_canadian_edu').value;
+            const english = parseInt(document.getElementById('calc_english').value) || 0;
+            const french = parseInt(document.getElementById('calc_french').value) || 0;
+            const foreignWork = parseInt(document.getElementById('calc_foreign_work').value) || 0;
+            const canadianWork = parseInt(document.getElementById('calc_canadian_work').value) || 0;
+            const sibling = document.getElementById('calc_sibling').checked;
+            const pnp = document.getElementById('calc_pnp').checked;
+            
+            // Spouse factors
+            let spouseEdu = 'none', spouseEnglish = 0, spouseWork = 0;
+            if (married) {
+                spouseEdu = document.getElementById('calc_spouse_edu').value;
+                spouseEnglish = parseInt(document.getElementById('calc_spouse_english').value) || 0;
+                spouseWork = parseInt(document.getElementById('calc_spouse_work').value) || 0;
+            }
+            
+            // Calculate scores for different scenarios
+            const scenarios = [];
+            
+            // Current situation
+            const currentScore = calculateCRSScore({
+                age, married, education, canadianEdu, english, french,
+                foreignWork, canadianWork, sibling, pnp,
+                spouseEdu, spouseEnglish, spouseWork
+            });
+            
+            scenarios.push({
+                name: 'Your Current Score',
+                score: currentScore.total,
+                breakdown: currentScore,
+                timeline: 'Today',
+                status: 'current'
+            });
+            
+            // With improved English
+            if (english < 9) {
+                const improvedEnglish = calculateCRSScore({
+                    age, married, education, canadianEdu, 
+                    english: 9, french,
+                    foreignWork, canadianWork, sibling, pnp,
+                    spouseEdu, spouseEnglish, spouseWork
+                });
+                scenarios.push({
+                    name: 'With CLB 9 English',
+                    score: improvedEnglish.total,
+                    breakdown: improvedEnglish,
+                    timeline: '3-6 months',
+                    status: 'improvement'
+                });
+            }
+            
+            // With French
+            if (french < 7) {
+                const withFrench = calculateCRSScore({
+                    age, married, education, canadianEdu, 
+                    english, french: 7,
+                    foreignWork, canadianWork, sibling, pnp,
+                    spouseEdu, spouseEnglish, spouseWork
+                });
+                scenarios.push({
+                    name: 'With French CLB 7',
+                    score: withFrench.total,
+                    breakdown: withFrench,
+                    timeline: '12-18 months',
+                    status: 'improvement'
+                });
+            }
+            
+            // With 1 year Canadian experience
+            if (canadianWork === 0) {
+                const withWork = calculateCRSScore({
+                    age: age + 1, married, education, canadianEdu, 
+                    english, french,
+                    foreignWork, canadianWork: 1, sibling, pnp,
+                    spouseEdu, spouseEnglish, spouseWork
+                });
+                scenarios.push({
+                    name: 'With 1 Year Canadian Experience',
+                    score: withWork.total,
+                    breakdown: withWork,
+                    timeline: '12 months',
+                    status: 'improvement'
+                });
+            }
+            
+            // Display results
+            displayCalculationResults(scenarios);
+        }
+        
+        // CRS Score calculation logic
+        function calculateCRSScore(params) {
+            let score = {
+                age: 0,
+                education: 0,
+                language: 0,
+                experience: 0,
+                skill: 0,
+                additional: 0,
+                spouse: 0,
+                total: 0
+            };
+            
+            // Age points
+            const agePoints = getAgePoints(params.age, params.married);
+            score.age = agePoints;
+            
+            // Education points
+            const eduPoints = getEducationPoints(params.education, params.married);
+            score.education = eduPoints;
+            
+            // Language points
+            const langPoints = getLanguagePoints(params.english, params.french, params.married);
+            score.language = langPoints;
+            
+            // Work experience points
+            const workPoints = getWorkPoints(params.canadianWork, params.married);
+            score.experience = workPoints;
+            
+            // Skill transferability (max 100)
+            const skillPoints = getSkillTransferabilityPoints(params);
+            score.skill = skillPoints;
+            
+            // Additional points
+            let additional = 0;
+            if (params.sibling) additional += 15;
+            if (params.pnp) additional += 600;
+            
+            // Canadian education bonus
+            if (params.canadianEdu === '1-2year') additional += 15;
+            if (params.canadianEdu === '3year') additional += 30;
+            
+            // French bonus
+            if (params.french >= 7 && params.english >= 5) {
+                additional += 50; // Bilingual bonus
+            } else if (params.french >= 7 && params.english < 5) {
+                additional += 25; // French only bonus
+            }
+            
+            score.additional = additional;
+            
+            // Spouse points
+            if (params.married) {
+                let spousePoints = 0;
+                
+                // Spouse education
+                if (params.spouseEdu === 'diploma') spousePoints += 7;
+                if (params.spouseEdu === 'bachelor') spousePoints += 8;
+                if (params.spouseEdu === 'master') spousePoints += 10;
+                
+                // Spouse language
+                if (params.spouseEnglish >= 9) spousePoints += 20;
+                else if (params.spouseEnglish >= 7) spousePoints += 12;
+                else if (params.spouseEnglish >= 6) spousePoints += 8;
+                else if (params.spouseEnglish >= 4) spousePoints += 4;
+                
+                // Spouse work
+                if (params.spouseWork >= 3) spousePoints += 10;
+                else if (params.spouseWork === 2) spousePoints += 7;
+                else if (params.spouseWork === 1) spousePoints += 5;
+                
+                score.spouse = spousePoints;
+            }
+            
+            score.total = score.age + score.education + score.language + score.experience + 
+                         score.skill + score.additional + score.spouse;
+            
+            return score;
+        }
+        
+        // Helper functions for point calculations
+        function getAgePoints(age, married) {
+            const ageTable = {
+                single: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99,105,110,110,110,110,110,110,110,110,110,110,105,99,94,88,83,77,72,66,61,55,50,39,28,17,6,0],
+                married: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,95,100,100,100,100,100,100,100,100,100,100,95,90,85,80,75,70,65,60,55,50,45,35,25,15,5,0]
+            };
+            const index = Math.min(age, 45);
+            return married ? ageTable.married[index] : ageTable.single[index];
+        }
+        
+        function getEducationPoints(education, married) {
+            const eduTable = {
+                none: { single: 0, married: 0 },
+                diploma1: { single: 90, married: 84 },
+                diploma2: { single: 98, married: 91 },
+                bachelor: { single: 120, married: 112 },
+                'two-or-more': { single: 128, married: 119 },
+                master: { single: 135, married: 126 },
+                phd: { single: 150, married: 140 }
+            };
+            return eduTable[education] ? (married ? eduTable[education].married : eduTable[education].single) : 0;
+        }
+        
+        function getLanguagePoints(english, french, married) {
+            // English points (first language)
+            const engTable = {
+                single: [0, 0, 0, 0, 6, 6, 9, 17, 23, 31, 34],
+                married: [0, 0, 0, 0, 6, 6, 8, 16, 22, 29, 32]
+            };
+            
+            let points = 0;
+            const engIndex = Math.min(english, 10);
+            points += (married ? engTable.married[engIndex] : engTable.single[engIndex]) * 4; // All 4 abilities
+            
+            // French points (second language)
+            if (french >= 5) {
+                points += Math.min(french - 4, 6) * 4; // 1 point for CLB 5-6, 3 for CLB 7-8, 6 for CLB 9+
+            }
+            
+            return points;
+        }
+        
+        function getWorkPoints(canadianWork, married) {
+            const workTable = {
+                single: [0, 40, 53, 64, 72, 80],
+                married: [0, 35, 46, 56, 63, 70]
+            };
+            const index = Math.min(canadianWork, 5);
+            return married ? workTable.married[index] : workTable.single[index];
+        }
+        
+        function getSkillTransferabilityPoints(params) {
+            let points = 0;
+            
+            // Education + Language
+            if (params.english >= 9 && ['bachelor', 'two-or-more', 'master', 'phd'].includes(params.education)) {
+                points += 50;
+            } else if (params.english >= 7 && ['bachelor', 'two-or-more', 'master', 'phd'].includes(params.education)) {
+                points += 25;
+            }
+            
+            // Foreign work + Language
+            if (params.foreignWork >= 3 && params.english >= 9) {
+                points += 50;
+            } else if (params.foreignWork >= 3 && params.english >= 7) {
+                points += 25;
+            } else if (params.foreignWork >= 1 && params.english >= 9) {
+                points += 25;
+            } else if (params.foreignWork >= 1 && params.english >= 7) {
+                points += 13;
+            }
+            
+            // Cap at 100
+            return Math.min(points, 100);
+        }
+        
+        // Display calculation results
+        function displayCalculationResults(scenarios) {
+            const resultsDiv = document.getElementById('calculationResults');
+            
+            // Sort scenarios by score
+            scenarios.sort((a, b) => b.score - a.score);
+            
+            let html = '<h3 style="color: #2d3748; margin-bottom: 25px; text-align: center;">Your CRS Score Results</h3>';
+            
+            // Score cards
+            html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">';
+            
+            scenarios.forEach((scenario, index) => {
+                const scoreColor = scenario.score >= 500 ? '#48bb78' : 
+                                 scenario.score >= 470 ? '#ed8936' : 
+                                 scenario.score >= 440 ? '#f6ad55' : '#e53e3e';
+                
+                const statusText = scenario.score >= 500 ? 'Excellent!' : 
+                                 scenario.score >= 470 ? 'Very Good' : 
+                                 scenario.score >= 440 ? 'Competitive' : 'Needs Improvement';
+                
+                html += `
+                    <div style="background: ${scenario.status === 'current' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white'}; 
+                               color: ${scenario.status === 'current' ? 'white' : '#2d3748'}; 
+                               padding: 25px; border-radius: 15px; 
+                               box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+                               text-align: center;
+                               border: 2px solid ${scenario.status === 'current' ? 'transparent' : '#e2e8f0'};">
+                        <h4 style="margin-bottom: 10px; font-size: 1.1em;">${scenario.name}</h4>
+                        <div style="font-size: 3em; font-weight: bold; margin: 15px 0; color: ${scenario.status === 'current' ? 'white' : scoreColor};">
+                            ${scenario.score}
+                        </div>
+                        <div style="font-size: 0.9em; opacity: 0.9;">${statusText}</div>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid ${scenario.status === 'current' ? 'rgba(255,255,255,0.3)' : '#e2e8f0'};">
+                            <small>Timeline: ${scenario.timeline}</small>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            
+            // Detailed breakdown for current score
+            const current = scenarios.find(s => s.status === 'current');
+            if (current) {
+                html += `
+                    <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 30px;">
+                        <h4 style="color: #2d3748; margin-bottom: 20px;">Score Breakdown</h4>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr style="background: #f7fafc;">
+                                <td style="padding: 12px; border: 1px solid #e2e8f0;"><strong>Category</strong></td>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right;"><strong>Points</strong></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0;">Age</td>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; color: #667eea; font-weight: 600;">${current.breakdown.age}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0;">Education</td>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; color: #667eea; font-weight: 600;">${current.breakdown.education}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0;">Language Skills</td>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; color: #667eea; font-weight: 600;">${current.breakdown.language}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0;">Canadian Experience</td>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; color: #667eea; font-weight: 600;">${current.breakdown.experience}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0;">Skill Transferability</td>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; color: #667eea; font-weight: 600;">${current.breakdown.skill}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0;">Additional Factors</td>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; color: #667eea; font-weight: 600;">${current.breakdown.additional}</td>
+                            </tr>
+                            ${current.breakdown.spouse > 0 ? `
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0;">Spouse Factors</td>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; color: #667eea; font-weight: 600;">${current.breakdown.spouse}</td>
+                            </tr>
+                            ` : ''}
+                            <tr style="background: #f7fafc;">
+                                <td style="padding: 12px; border: 1px solid #e2e8f0;"><strong>Total CRS Score</strong></td>
+                                <td style="padding: 12px; border: 1px solid #e2e8f0; text-align: right; font-size: 1.2em;"><strong>${current.breakdown.total}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            // Recommendations
+            html += `
+                <div class="info-box" style="background: #edf2f7; border-left: 4px solid #4299e1; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+                    <h4 style="color: #2d3748; margin-bottom: 10px;">💡 Your Best Path Forward</h4>
+                    <p style="color: #4a5568; line-height: 1.6;">
+                        ${getRecommendations(scenarios)}
+                    </p>
+                </div>
+            `;
+            
+            // Export button
+            html += `
+                <div style="text-align: center; margin-top: 30px;">
+                    <button onclick="exportCalculation()" style="padding: 14px 30px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">
+                        📥 Export Results
+                    </button>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Get personalized recommendations
+        function getRecommendations(scenarios) {
+            const current = scenarios.find(s => s.status === 'current');
+            const best = scenarios[0];
+            
+            let recommendations = [];
+            
+            if (current.score >= 500) {
+                recommendations.push("Your score is excellent! You should receive an invitation in the next Express Entry draw.");
+            } else if (current.score >= 470) {
+                recommendations.push("Your score is competitive. Monitor upcoming draws closely - you're likely to receive an invitation soon.");
+            } else if (current.score >= 440) {
+                recommendations.push("Your score is moderate. Consider French language draws where the cutoff is typically much lower (350-430).");
+            } else {
+                recommendations.push("Focus on the improvements shown above to increase your score. French language proficiency offers the best return on investment.");
+            }
+            
+            // Specific improvement suggestions
+            if (best.score - current.score >= 50) {
+                recommendations.push(`The improvements shown could increase your score by ${best.score - current.score} points!`);
+            }
+            
+            const hasFrenchScenario = scenarios.find(s => s.name.includes('French'));
+            if (hasFrenchScenario && hasFrenchScenario.score >= 430) {
+                recommendations.push("Learning French to CLB 7 would qualify you for French-targeted draws with much lower requirements.");
+            }
+            
+            return recommendations.join(" ");
+        }
+        
+        // Export calculation results
+        function exportCalculation() {
+            const results = [];
+            results.push("=== CANADA PR PATHWAYS CALCULATOR RESULTS ===");
+            results.push(`Generated: ${new Date().toLocaleDateString()}`);
+            results.push("");
+            
+            // Get form values for summary
+            const age = Math.floor((new Date() - new Date(document.getElementById('calc_dob').value)) / (365.25 * 24 * 60 * 60 * 1000));
+            
+            results.push("YOUR PROFILE:");
+            results.push(`Age: ${age} years`);
+            results.push(`Education: ${document.getElementById('calc_education').selectedOptions[0].text}`);
+            results.push(`English: CLB ${document.getElementById('calc_english').value}`);
+            results.push(`French: ${document.getElementById('calc_french').value === '0' ? 'None' : 'NCLC ' + document.getElementById('calc_french').value}`);
+            results.push(`Canadian Work Experience: ${document.getElementById('calc_canadian_work').selectedOptions[0].text}`);
+            results.push(`Foreign Work Experience: ${document.getElementById('calc_foreign_work').selectedOptions[0].text}`);
+            results.push("");
+            
+            // Get scenarios from display
+            const scenarioCards = document.querySelectorAll('#calculationResults > div > div');
+            results.push("CRS SCORES:");
+            scenarioCards.forEach(card => {
+                const title = card.querySelector('h4')?.textContent || '';
+                const score = card.querySelector('div[style*="font-size: 3em"]')?.textContent || '';
+                const timeline = card.querySelector('small')?.textContent || '';
+                if (title && score) {
+                    results.push(`${title}: ${score} points (${timeline})`);
+                }
+            });
+            
+            results.push("");
+            results.push("NEXT STEPS:");
+            results.push("1. Take official language tests (IELTS/CELPIP for English, TEF/TCF for French)");
+            results.push("2. Get Educational Credential Assessment (ECA) for foreign degrees");
+            results.push("3. Create Express Entry profile when ready");
+            results.push("4. Monitor draw scores and requirements");
+            
+            results.push("");
+            results.push("For more information, visit: https://pr-calc.samwu.dev");
+            
+            // Create and download file
+            const blob = new Blob([results.join('\n')], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `CRS_Score_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html>
