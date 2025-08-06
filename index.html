@@ -1781,11 +1781,14 @@
                 </div>
             `;
             
-            // Export button
+            // Export and Advanced View buttons
             html += `
-                <div style="text-align: center; margin-top: 30px;">
+                <div style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                     <button onclick="exportCalculation()" style="padding: 14px 30px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">
                         📥 Export Results
+                    </button>
+                    <button onclick="showAdvancedAnalysis()" style="padding: 14px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">
+                        📊 View All Scenario Combinations
                     </button>
                 </div>
             `;
@@ -1872,6 +1875,319 @@
             a.download = `CRS_Score_${new Date().toISOString().split('T')[0]}.txt`;
             a.click();
             URL.revokeObjectURL(url);
+        }
+        
+        // Show Advanced Analysis View
+        function showAdvancedAnalysis() {
+            // Get current user data
+            const dob = new Date(document.getElementById('calc_dob').value);
+            const today = new Date();
+            const age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+            const married = document.getElementById('calc_marital').value === 'married';
+            const education = document.getElementById('calc_education').value;
+            const canadianEdu = document.getElementById('calc_canadian_edu').value;
+            const currentEnglish = parseInt(document.getElementById('calc_english').value) || 0;
+            const currentFrench = parseInt(document.getElementById('calc_french').value) || 0;
+            const foreignWork = parseInt(document.getElementById('calc_foreign_work').value) || 0;
+            const currentCanadianWork = parseInt(document.getElementById('calc_canadian_work').value) || 0;
+            const sibling = document.getElementById('calc_sibling').checked;
+            const pnp = document.getElementById('calc_pnp').checked;
+            
+            // Spouse data
+            let spouseEdu = 'none', spouseEnglish = 0, spouseWork = 0;
+            if (married) {
+                spouseEdu = document.getElementById('calc_spouse_edu').value;
+                spouseEnglish = parseInt(document.getElementById('calc_spouse_english').value) || 0;
+                spouseWork = parseInt(document.getElementById('calc_spouse_work').value) || 0;
+            }
+            
+            // Generate all possible combinations
+            const allScenarios = generateAllScenarios({
+                age, married, education, canadianEdu, foreignWork, sibling, pnp,
+                spouseEdu, spouseEnglish, currentEnglish, currentFrench, currentCanadianWork, spouseWork
+            });
+            
+            // Create modal with advanced table
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                z-index: 10000;
+                overflow-y: auto;
+                padding: 20px;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                max-width: 1400px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                position: relative;
+            `;
+            
+            // Create table HTML
+            let tableHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #2d3748; margin: 0;">Advanced Scenario Analysis - All Combinations</h2>
+                    <button onclick="this.closest('div[style*=fixed]').remove()" style="background: #e53e3e; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">✕ Close</button>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 0.9em; opacity: 0.9;">Highest Score</div>
+                        <div style="font-size: 2em; font-weight: bold; margin: 5px 0;">${Math.max(...allScenarios.map(s => s.total))}</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 0.9em; opacity: 0.9;">Current Score</div>
+                        <div style="font-size: 2em; font-weight: bold; margin: 5px 0;">${allScenarios.find(s => s.isCurrent).total}</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white; padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 0.9em; opacity: 0.9;">French Impact</div>
+                        <div style="font-size: 2em; font-weight: bold; margin: 5px 0;">+${calculateFrenchImpact(allScenarios)}</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); color: white; padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 0.9em; opacity: 0.9;">Total Scenarios</div>
+                        <div style="font-size: 2em; font-weight: bold; margin: 5px 0;">${allScenarios.length}</div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="margin-right: 10px; color: #4a5568; font-weight: 600;">Filter by minimum score:</label>
+                    <select onchange="filterAdvancedTable(this.value)" style="padding: 8px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                        <option value="0">Show All</option>
+                        <option value="450">450+ points</option>
+                        <option value="480">480+ points</option>
+                        <option value="500">500+ points</option>
+                        <option value="520">520+ points</option>
+                    </select>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%); color: white;">
+                                <th rowspan="2" style="padding: 10px; border: 1px solid #4a5568; position: sticky; left: 0; background: #2d3748; z-index: 2;">#</th>
+                                <th rowspan="2" style="padding: 10px; border: 1px solid #4a5568;">Timeline</th>
+                                <th colspan="5" style="padding: 10px; border: 1px solid #4a5568; background: #2d3748;">Variables</th>
+                                <th colspan="8" style="padding: 10px; border: 1px solid #4a5568; background: #2d3748;">Your Points</th>
+                                ${married ? '<th colspan="3" style="padding: 10px; border: 1px solid #4a5568; background: #2d3748;">Spouse Points</th>' : ''}
+                                <th rowspan="2" style="padding: 10px; border: 1px solid #4a5568; background: #48bb78;">Total CRS</th>
+                            </tr>
+                            <tr style="background: #4a5568; color: white;">
+                                <th style="padding: 8px; border: 1px solid #4a5568;">Application</th>
+                                <th style="padding: 8px; border: 1px solid #4a5568;">Your Fr</th>
+                                <th style="padding: 8px; border: 1px solid #4a5568;">Your CA Work</th>
+                                ${married ? '<th style="padding: 8px; border: 1px solid #4a5568;">Spouse Fr</th>' : ''}
+                                ${married ? '<th style="padding: 8px; border: 1px solid #4a5568;">Spouse CA Work</th>' : ''}
+                                <th style="padding: 8px; border: 1px solid #4a5568;">Age</th>
+                                <th style="padding: 8px; border: 1px solid #4a5568;">Edu</th>
+                                <th style="padding: 8px; border: 1px solid #4a5568;">Eng</th>
+                                <th style="padding: 8px; border: 1px solid #4a5568;">Fr</th>
+                                <th style="padding: 8px; border: 1px solid #4a5568;">CA Exp</th>
+                                <th style="padding: 8px; border: 1px solid #4a5568;">Skill</th>
+                                <th style="padding: 8px; border: 1px solid #4a5568;">CA Edu</th>
+                                <th style="padding: 8px; border: 1px solid #4a5568;">Fr Bonus</th>
+                                ${married ? '<th style="padding: 8px; border: 1px solid #4a5568;">Edu</th>' : ''}
+                                ${married ? '<th style="padding: 8px; border: 1px solid #4a5568;">Lang</th>' : ''}
+                                ${married ? '<th style="padding: 8px; border: 1px solid #4a5568;">Work</th>' : ''}
+                            </tr>
+                        </thead>
+                        <tbody id="advancedTableBody">
+            `;
+            
+            // Add rows
+            allScenarios.forEach((scenario, index) => {
+                const scoreClass = scenario.total >= 520 ? 'background: #c6f6d5;' : 
+                                  scenario.total >= 480 ? 'background: #fed7aa;' : 
+                                  'background: #e2e8f0;';
+                
+                const rowStyle = scenario.isCurrent ? 'background: #fef5e7; box-shadow: 0 2px 4px rgba(0,0,0,0.1);' : '';
+                
+                tableHTML += `
+                    <tr class="advanced-row" data-score="${scenario.total}" style="${rowStyle}">
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold; position: sticky; left: 0; background: white; ${rowStyle}">${index + 1}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0;">${scenario.timeline}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0;"><strong>${scenario.appType}</strong></td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.yourFrench ? '✓' : '✗'}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.yourCAWork}</td>
+                        ${married ? `<td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.spouseFrench ? '✓' : '✗'}</td>` : ''}
+                        ${married ? `<td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.spouseCAWork}</td>` : ''}
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.age}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.education}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.english}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.french}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.canadianExp}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.skill}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.canadianEdu}</td>
+                        <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.frenchBonus}</td>
+                        ${married ? `<td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.spouseEdu}</td>` : ''}
+                        ${married ? `<td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.spouseLang}</td>` : ''}
+                        ${married ? `<td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${scenario.breakdown.spouseWork}</td>` : ''}
+                        <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold; font-size: 1.1em; text-align: center; ${scoreClass}">${scenario.total}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 25px; padding: 20px; background: #f7fafc; border-radius: 10px;">
+                    <h4 style="color: #2d3748; margin-bottom: 10px;">📈 Key Insights from All Combinations</h4>
+                    <ul style="color: #4a5568; line-height: 1.8;">
+                        <li>Your highest possible score is <strong>${Math.max(...allScenarios.map(s => s.total))} points</strong></li>
+                        <li>Learning French (CLB 7) adds an average of <strong>${calculateFrenchImpact(allScenarios)} points</strong></li>
+                        <li>One year of Canadian work experience adds <strong>${married ? '35' : '40'} points</strong> directly</li>
+                        <li>${allScenarios.filter(s => s.total >= 480).length} out of ${allScenarios.length} scenarios score above 480 (competitive threshold)</li>
+                        <li>${allScenarios.filter(s => s.total >= 430).length} scenarios qualify for French-targeted draws (430+ with French)</li>
+                    </ul>
+                </div>
+            `;
+            
+            modalContent.innerHTML = tableHTML;
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+        }
+        
+        // Generate all possible scenarios
+        function generateAllScenarios(userData) {
+            const scenarios = [];
+            const timeframes = [
+                { name: 'Current', years: 0, label: 'Today' },
+                { name: '6 months', years: 0.5, label: 'Jun 2025' },
+                { name: '1 year', years: 1, label: 'Dec 2025' },
+                { name: '2 years', years: 2, label: 'Dec 2026' }
+            ];
+            
+            // Variables to iterate
+            const frenchOptions = [false, true]; // No French, CLB 7
+            const canadianWorkOptions = [0, 1, 2]; // None, 1 year, 2 years
+            const spouseWorkOptions = userData.married ? [0, 1, 2] : [0]; // Spouse work options
+            
+            timeframes.forEach(timeframe => {
+                frenchOptions.forEach(hasFrench => {
+                    canadianWorkOptions.forEach(caWork => {
+                        // Skip invalid combinations (can't have 2 years work in 6 months)
+                        if (caWork > timeframe.years + userData.currentCanadianWork) continue;
+                        
+                        if (userData.married) {
+                            // Joint application scenarios
+                            spouseWorkOptions.forEach(spWork => {
+                                if (spWork > timeframe.years + userData.spouseWork) continue;
+                                
+                                const scenario = calculateDetailedScenario({
+                                    ...userData,
+                                    age: userData.age + Math.floor(timeframe.years),
+                                    french: hasFrench ? 7 : userData.currentFrench,
+                                    canadianWork: Math.min(caWork, 5),
+                                    spouseWork: Math.min(spWork, 5),
+                                    timeline: timeframe.label,
+                                    appType: 'Joint',
+                                    yourFrench: hasFrench,
+                                    yourCAWork: caWork,
+                                    spouseFrench: false, // Could add spouse French scenarios
+                                    spouseCAWork: spWork,
+                                    isCurrent: timeframe.years === 0 && !hasFrench && caWork === userData.currentCanadianWork && spWork === userData.spouseWork
+                                });
+                                scenarios.push(scenario);
+                            });
+                        } else {
+                            // Solo application scenarios
+                            const scenario = calculateDetailedScenario({
+                                ...userData,
+                                age: userData.age + Math.floor(timeframe.years),
+                                french: hasFrench ? 7 : userData.currentFrench,
+                                canadianWork: Math.min(caWork, 5),
+                                timeline: timeframe.label,
+                                appType: 'Solo',
+                                yourFrench: hasFrench,
+                                yourCAWork: caWork,
+                                spouseFrench: false,
+                                spouseCAWork: 0,
+                                isCurrent: timeframe.years === 0 && !hasFrench && caWork === userData.currentCanadianWork
+                            });
+                            scenarios.push(scenario);
+                        }
+                    });
+                });
+            });
+            
+            // Sort by total score descending
+            scenarios.sort((a, b) => b.total - a.total);
+            
+            return scenarios;
+        }
+        
+        // Calculate detailed scenario breakdown
+        function calculateDetailedScenario(params) {
+            const score = calculateCRSScore({
+                age: params.age,
+                married: params.married,
+                education: params.education,
+                canadianEdu: params.canadianEdu,
+                english: params.currentEnglish || 9,
+                french: params.french,
+                foreignWork: params.foreignWork,
+                canadianWork: params.canadianWork,
+                sibling: params.sibling,
+                pnp: params.pnp,
+                spouseEdu: params.spouseEdu,
+                spouseEnglish: params.spouseEnglish,
+                spouseWork: params.spouseWork
+            });
+            
+            return {
+                timeline: params.timeline,
+                appType: params.appType,
+                yourFrench: params.yourFrench,
+                yourCAWork: params.yourCAWork,
+                spouseFrench: params.spouseFrench,
+                spouseCAWork: params.spouseCAWork,
+                breakdown: {
+                    age: score.age,
+                    education: score.education,
+                    english: params.currentEnglish >= 9 ? (params.married ? 116 : 124) : (params.married ? 64 : 68),
+                    french: params.french >= 7 ? 12 : 0,
+                    canadianExp: score.experience,
+                    skill: score.skill,
+                    canadianEdu: params.canadianEdu === '3year' ? 30 : params.canadianEdu === '1-2year' ? 15 : 0,
+                    frenchBonus: params.french >= 7 && params.currentEnglish >= 5 ? 50 : 0,
+                    spouseEdu: params.married ? (params.spouseEdu === 'master' ? 10 : params.spouseEdu === 'bachelor' ? 8 : 0) : 0,
+                    spouseLang: params.married ? (params.spouseEnglish >= 7 ? 12 : params.spouseEnglish >= 5 ? 6 : 0) : 0,
+                    spouseWork: params.married ? (params.spouseWork >= 2 ? 7 : params.spouseWork === 1 ? 5 : 0) : 0
+                },
+                total: score.total,
+                isCurrent: params.isCurrent
+            };
+        }
+        
+        // Calculate French impact
+        function calculateFrenchImpact(scenarios) {
+            const withFrench = scenarios.filter(s => s.yourFrench);
+            const withoutFrench = scenarios.filter(s => !s.yourFrench);
+            
+            if (withFrench.length === 0 || withoutFrench.length === 0) return 0;
+            
+            const avgWith = withFrench.reduce((sum, s) => sum + s.total, 0) / withFrench.length;
+            const avgWithout = withoutFrench.reduce((sum, s) => sum + s.total, 0) / withoutFrench.length;
+            
+            return Math.round(avgWith - avgWithout);
+        }
+        
+        // Filter advanced table
+        window.filterAdvancedTable = function(minScore) {
+            const rows = document.querySelectorAll('.advanced-row');
+            rows.forEach(row => {
+                const score = parseInt(row.dataset.score);
+                row.style.display = score >= minScore ? '' : 'none';
+            });
         }
     </script>
 </body>
