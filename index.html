@@ -535,10 +535,10 @@
     <!-- Navigation -->
     <div class="nav-tabs">
         <div class="nav-container">
-            <button class="nav-tab active" onclick="switchSection('learn')">📚 Learn</button>
-            <button class="nav-tab" onclick="switchSection('pathways')">🗺️ Pathways</button>
-            <button class="nav-tab" onclick="switchSection('calculator')">🧮 Calculator</button>
-            <button class="nav-tab" onclick="switchSection('resources')">📖 Resources</button>
+            <button class="nav-tab active" onclick="switchSection('learn', this)">📚 Learn</button>
+            <button class="nav-tab" onclick="switchSection('pathways', this)">🗺️ Pathways</button>
+            <button class="nav-tab" onclick="switchSection('calculator', this)">🧮 Calculator</button>
+            <button class="nav-tab" onclick="switchSection('resources', this)">📖 Resources</button>
         </div>
     </div>
     
@@ -958,12 +958,22 @@
     
     <script>
         // Section switching
-        function switchSection(section) {
+        function switchSection(section, element) {
             // Update nav tabs
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            event.target.classList.add('active');
+            // Use the element parameter or find the tab by section name
+            if (element) {
+                element.classList.add('active');
+            } else {
+                // Fallback: find the correct tab
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    if (tab.textContent.toLowerCase().includes(section.toLowerCase())) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
             
             // Update content sections
             document.querySelectorAll('.content-section').forEach(sec => {
