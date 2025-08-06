@@ -2085,12 +2085,12 @@
                 frenchOptions.forEach(hasFrench => {
                     canadianWorkOptions.forEach(caWork => {
                         // Skip invalid combinations (can't have 2 years work in 6 months)
-                        if (caWork > timeframe.years + userData.currentCanadianWork) continue;
+                        if (caWork > timeframe.years + userData.currentCanadianWork) return;
                         
                         if (userData.married) {
                             // Joint application scenarios
                             spouseWorkOptions.forEach(spWork => {
-                                if (spWork > timeframe.years + userData.spouseWork) continue;
+                                if (spWork > timeframe.years + userData.spouseWork) return;
                                 
                                 const scenario = calculateDetailedScenario({
                                     ...userData,
