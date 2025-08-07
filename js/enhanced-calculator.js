@@ -18,7 +18,6 @@ function getEnhancedCalculatorHTML(journey) {
             
             <div style="padding: 40px;">
                 <form id="enhancedCalcForm">
-                    <!-- Personal Information -->
                     <div class="form-section">
                         <h3>👤 Personal Information</h3>
                         <div class="form-grid">
@@ -70,7 +69,6 @@ function getEnhancedCalculatorHTML(journey) {
                         </div>
                     </div>
                     
-                    <!-- Education Section -->
                     <div class="form-section">
                         <h3>🎓 Education</h3>
                         <div class="form-grid">
@@ -132,11 +130,9 @@ function getEnhancedCalculatorHTML(journey) {
                         </div>
                     </div>
                     
-                    <!-- Language Section -->
                     <div class="form-section">
                         <h3>🗣️ Language Skills</h3>
                         
-                        <!-- English -->
                         <div style="margin-bottom: 30px;">
                             <h4 style="color: #4a5568; margin-bottom: 15px;">English Proficiency</h4>
                             <div class="status-radio-group">
@@ -220,7 +216,6 @@ function getEnhancedCalculatorHTML(journey) {
                             </div>
                         </div>
                         
-                        <!-- French -->
                         <div>
                             <h4 style="color: #4a5568; margin-bottom: 15px;">French Proficiency</h4>
                             <div class="status-radio-group">
@@ -291,7 +286,6 @@ function getEnhancedCalculatorHTML(journey) {
                         </div>
                     </div>
                     
-                    <!-- Work Experience -->
                     <div class="form-section">
                         <h3>💼 Work Experience</h3>
                         <div class="form-grid">
@@ -339,7 +333,6 @@ function getEnhancedCalculatorHTML(journey) {
                         </div>
                     </div>
                     
-                    <!-- Additional Factors -->
                     <div class="form-section">
                         <h3>➕ Additional Factors</h3>
                         <div class="checkbox-group">
@@ -361,7 +354,6 @@ function getEnhancedCalculatorHTML(journey) {
                     </button>
                 </form>
                 
-                <!-- Results Section -->
                 <div id="enhancedResults" class="results-section"></div>
             </div>
         </div>
@@ -647,7 +639,6 @@ function displayEnhancedResults(scenarios, recommendations, userData) {
     let html = `
         <h3 style="text-align: center; color: #2d3748; margin: 30px 0;">Your CRS Score Timeline</h3>
         
-        <!-- Timeline Visualization -->
         <div style="background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); padding: 30px; border-radius: 15px; margin-bottom: 30px;">
             <div style="position: relative; height: 80px; margin: 20px 0;">
                 <div style="position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: #e2e8f0; transform: translateY(-50%);"></div>
@@ -672,7 +663,6 @@ function displayEnhancedResults(scenarios, recommendations, userData) {
             </div>
         </div>
         
-        <!-- Scenario Cards -->
         <div class="scenario-cards">
             ${scenarios.map(scenario => {
                 const scoreColor = scenario.score >= 500 ? '#48bb78' : 
@@ -707,7 +697,6 @@ function displayEnhancedResults(scenarios, recommendations, userData) {
             }).join('')}
         </div>
         
-        <!-- Recommendations -->
         <div style="margin-top: 30px;">
             ${recommendations.map(rec => `
                 <div class="info-box ${rec.type === 'success' ? 'success' : rec.type === 'warning' ? 'warning' : ''}">
@@ -717,7 +706,6 @@ function displayEnhancedResults(scenarios, recommendations, userData) {
             `).join('')}
         </div>
         
-        <!-- Action Buttons -->
         <div style="text-align: center; margin-top: 30px;">
             <button onclick="showAdvancedAnalysis()" style="padding: 14px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; margin: 0 10px;">
                 📊 View All Scenario Combinations
@@ -823,7 +811,6 @@ function displayAdvancedAnalysisModal(scenarios) {
             <button onclick="closeAdvancedAnalysis()" style="background: #e53e3e; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">✕ Close</button>
         </div>
         
-        <!-- Summary Cards -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
                 <h3 style="margin: 0 0 10px 0; font-size: 1.1em; opacity: 0.9;">Highest Score</h3>
@@ -847,7 +834,6 @@ function displayAdvancedAnalysisModal(scenarios) {
             </div>
         </div>
         
-        <!-- Filters -->
         <div style="margin: 20px 0; padding: 15px; background: #f7fafc; border-radius: 8px; display: flex; gap: 20px; flex-wrap: wrap;">
             <div>
                 <label style="font-weight: 600; margin-right: 10px; color: #4a5568;">Timeframe:</label>
@@ -879,7 +865,6 @@ function displayAdvancedAnalysisModal(scenarios) {
             </div>
         </div>
         
-        <!-- Table Container -->
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
                 <thead style="background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%); color: white; position: sticky; top: 0; z-index: 10;">

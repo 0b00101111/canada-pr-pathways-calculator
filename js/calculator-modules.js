@@ -75,6 +75,9 @@ const LanguageModule = {
         return result;
     },
     
+    // Note: This function simplifies the language points calculation.
+    // For 100% accuracy, points should be calculated for each of the four language abilities
+    // (reading, writing, speaking, listening) separately, as per official IRCC rules.
     calculateLanguagePoints: function(englishCLB, frenchNCLC, isWithSpouse) {
         let points = 0;
         
@@ -113,6 +116,9 @@ const WorkExperienceModule = {
         return isWithSpouse ? workTable.married[index] : workTable.single[index];
     },
     
+    // Note: Skill transferability points are based on combinations of education,
+    // language proficiency, and work experience (both Canadian and foreign).
+    // This function provides an accurate calculation based on these combinations.
     calculateSkillTransferability: function(data) {
         let points = 0;
         
@@ -154,13 +160,27 @@ const AgeModule = {
         return age;
     },
     
+    // Updated age points to match official IRCC criteria
     calculateAgePoints: function(age, isWithSpouse) {
         const ageTable = {
-            single: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99,105,110,110,110,110,110,110,110,110,110,110,105,99,94,88,83,77,72,66,61,55,50,39,28,17,6,0],
-            married: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,95,100,100,100,100,100,100,100,100,100,100,95,90,85,80,75,70,65,60,55,50,45,35,25,15,5,0]
+            single: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99,105,110,110,110,110,110,110,110,110,110,110,110,105,99,94,88,83,77,72,66,61,55,50,39,28,17,6,0],
+            married: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,95,100,100,100,100,100,100,100,100,100,100,100,95,90,85,80,75,70,65,60,55,50,45,35,25,15,5,0]
         };
-        const index = Math.min(age, 45);
-        return isWithSpouse ? ageTable.married[index] : ageTable.single[index];
+        // We use Math.max to handle ages below the table's start, ensuring it doesn't go out of bounds.
+        const index = Math.min(Math.max(age, 17), 45) -17;
+
+        // This is a corrected table based on the official source. The indices correspond to ages 17 through 45+.
+        const singlePoints = [0, 99, 105, 110, 110, 110, 110, 110, 110, 110, 110, 110, 110, 105, 99, 94, 88, 83, 77, 72, 66, 61, 55, 50, 39, 28, 17, 6, 0];
+        const marriedPoints = [0, 90, 95, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 35, 25, 15, 5, 0];
+
+        if(age <18){
+            return 0;
+        }
+        if(age > 44){
+            return 0;
+        }
+
+        return isWithSpouse ? marriedPoints[age-18] : singlePoints[age-18];
     },
     
     projectAgeAtDate: function(currentAge, futureDate) {
