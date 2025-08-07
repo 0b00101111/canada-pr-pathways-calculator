@@ -115,6 +115,72 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Pathways Overview Section */
+        .pathways-overview {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .pathways-overview h2 {
+            font-size: 2em;
+            color: #2d3748;
+            margin-bottom: 30px;
+        }
+
+        .pathway-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .pathway-overview-card {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .pathway-overview-card h3 {
+            font-size: 1.5em;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .pathway-overview-card p {
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .pathway-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            text-align: left;
+        }
+
+        .pathway-details.open {
+            max-height: 2000px; /* Large enough to fit content */
+        }
+
+        .learn-more-btn {
+            background: #e53e3e;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .learn-more-btn:hover {
+            background: #c53030;
+        }
         
         /* Learn Section */
         .intro-hero {
@@ -288,7 +354,7 @@
         }
         
         .faq-item.open .faq-answer {
-            max-height: 500px;
+            max-height: 1500px; /* Adjusted for longer content */
         }
         
         .faq-answer-content {
@@ -760,13 +826,11 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="header">
         <h1>🍁 Canada PR Pathways Calculator</h1>
         <p>Understand Canadian immigration, calculate your score, and discover your pathway to permanent residence</p>
     </div>
     
-    <!-- Navigation -->
     <div class="nav-tabs">
         <div class="nav-container">
             <button class="nav-tab active" onclick="switchSection('learn', this)">📚 Learn</button>
@@ -777,12 +841,60 @@
     </div>
     
     <div class="container">
-        <!-- Learn Section -->
+        <section class="pathways-overview">
+            <h2>Your Path to Canada: An Overview</h2>
+            <div class="pathway-cards-container">
+                <div class="pathway-overview-card">
+                    <h3>Economic Class</h3>
+                    <p>For individuals who can contribute to Canada's economy through their skills, work experience, or business ventures.</p>
+                    <button class="learn-more-btn" onclick="toggleDetails(this, 'economic-details')">Learn More</button>
+                    <div class="pathway-details" id="economic-details">
+                        <hr style="margin:20px 0;">
+                        <h5>Express Entry System</h5>
+                        <p>An online system for skilled workers. It includes:</p>
+                        <ul>
+                            <li><strong>Federal Skilled Worker Program (FSWP):</strong> For those with foreign work experience.</li>
+                            <li><strong>Canadian Experience Class (CEC):</strong> For those with Canadian work experience.</li>
+                            <li><strong>Federal Skilled Trades Program (FSTP):</strong> For those qualified in a skilled trade.</li>
+                        </ul>
+                        <h5>Provincial Nominee Programs (PNPs)</h5>
+                        <p>Provinces nominate individuals for PR based on local economic needs.</p>
+                        <h5>Business Immigration</h5>
+                        <p>Includes the Start-up Visa and Self-employed Persons Program.</p>
+                    </div>
+                </div>
+                <div class="pathway-overview-card">
+                    <h3>Family Class</h3>
+                    <p>Allows Canadian citizens and permanent residents to sponsor their relatives to come to Canada.</p>
+                    <button class="learn-more-btn" onclick="toggleDetails(this, 'family-details')">Learn More</button>
+                    <div class="pathway-details" id="family-details">
+                        <hr style="margin:20px 0;">
+                        <h5>Spouse, Partner, or Children Sponsorship</h5>
+                        <p>Sponsor your spouse, common-law partner, or dependent children to become permanent residents.</p>
+                        <h5>Parents and Grandparents Program</h5>
+                        <p>A lottery-based program to sponsor your parents or grandparents.</p>
+                    </div>
+                </div>
+                <div class="pathway-overview-card">
+                    <h3>Refugee & Humanitarian</h3>
+                    <p>For individuals seeking protection from persecution or who are in a situation of significant distress.</p>
+                    <button class="learn-more-btn" onclick="toggleDetails(this, 'refugee-details')">Learn More</button>
+                    <div class="pathway-details" id="refugee-details">
+                        <hr style="margin:20px 0;">
+                        <h5>Refugee Resettlement</h5>
+                        <p>For those who need protection and are resettled in Canada from abroad.</p>
+                        <h5>Asylum Claims</h5>
+                        <p>For individuals making a claim for refugee protection from within Canada.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="content-section active" id="learnSection">
             <div class="intro-hero">
                 <h2>Welcome to Your Canadian Immigration Journey!</h2>
-                <p>If you're confused by terms like "Express Entry," "CRS," or "PNP," you're not alone. Even people who've been in Canada for years find the immigration system overwhelming.</p>
-                <p>Let's break it down in simple terms. Think of immigrating to Canada like applying to university - there's an application system (Express Entry), a scoring method (CRS), and different programs you can qualify for. Some paths are harder, some easier, but understanding the system is half the battle.</p>
+                <p>If you're confused by terms like "Express Entry," "CRS," or "PNP," you're not alone. The Canadian immigration system can be complex, but this tool is here to help.</p>
+                <p>This calculator focuses on the <strong>Express Entry system</strong>, the main pathway for skilled workers. For a broader look at all immigration options, see the "Your Path to Canada" overview above. Remember to always consult official IRCC resources for the most accurate information.</p>
             </div>
             
             <h2 style="margin: 40px 0 30px; color: #2d3748; font-size: 1.8em;">Key Terms You Need to Know</h2>
@@ -853,7 +965,6 @@
             
             <div class="faq-section">
                 <h2 style="margin: 40px 0 30px; color: #2d3748; font-size: 1.8em;">Common Questions</h2>
-                
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFAQ(this)">
                         Do I need a job offer to immigrate to Canada?
@@ -900,7 +1011,6 @@
             </div>
         </section>
         
-        <!-- Pathways Section -->
         <section class="content-section" id="pathwaysSection">
             <h2 style="margin: 30px 0; color: #2d3748; font-size: 2em;">Common Pathways to Canadian PR</h2>
             
@@ -1014,15 +1124,20 @@
             </div>
         </section>
         
-        <!-- Calculator Section -->
         <section class="content-section" id="calculatorSection">
+
+            <div class="info-box warning">
+                <h4>⚠️ Important Disclaimer</h4>
+                <p>This is an unofficial tool and is intended for educational purposes only. Immigration policies can change at any time. For the most accurate and up-to-date information, please always refer to the <a href="https://www.canada.ca/en/immigration-refugees-citizenship.html" target="_blank" style="font-weight: 600;">official IRCC website</a>.</p>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #718096;">(Last policy verification: August 6, 2025)</p>
+            </div>
+
             <div class="calculator-intro">
                 <h2>Ready to Calculate Your Score?</h2>
                 <p>Our enhanced calculator doesn't just give you a number - it tracks your progress, shows multiple scenarios and timelines, helping you understand which improvements give the best return on investment.</p>
                 <button class="start-calculator-btn" onclick="startCalculator()">Start Enhanced Calculator →</button>
             </div>
             
-            <!-- Journey Selection (Initially Hidden) -->
             <div class="journey-selection" id="journeySelection">
                 <h3 style="text-align: center; margin-bottom: 30px; color: #2d3748;">First, which best describes your situation?</h3>
                 <div class="journey-cards">
@@ -1070,13 +1185,10 @@
                 </div>
             </div>
             
-            <!-- Calculator Form (Hidden until journey selected) -->
             <div class="calculator-form" id="calculatorForm">
-                <!-- Enhanced calculator will be loaded here -->
-            </div>
+                </div>
         </section>
         
-        <!-- Resources Section -->
         <section class="content-section" id="resourcesSection">
             <h2 style="margin: 30px 0; color: #2d3748; font-size: 2em;">Essential Resources</h2>
             
@@ -1179,7 +1291,6 @@
         </section>
     </div>
     
-    <!-- Footer -->
     <div class="footer">
         <p>Canada PR Pathways Calculator - Free & Open Source</p>
         <p>Made with ❤️ for the Canadian immigration community</p>
@@ -1189,7 +1300,6 @@
         </p>
     </div>
     
-    <!-- Load the calculator modules -->
     <script src="js/calculator-modules.js"></script>
     <script src="js/enhanced-calculator.js"></script>
     
@@ -1203,6 +1313,27 @@
                 console.log('All calculator modules loaded and ready');
             }
         });
+
+        // Toggle for new pathway details section
+        function toggleDetails(button, detailsId) {
+            const details = document.getElementById(detailsId);
+            const isOpen = details.classList.contains('open');
+
+            // Close all other open details
+            document.querySelectorAll('.pathway-details.open').forEach(openDetail => {
+                if(openDetail.id !== detailsId){
+                    openDetail.classList.remove('open');
+                    // Reset other buttons' text
+                    const otherButton = openDetail.previousElementSibling;
+                    if(otherButton) otherButton.textContent = 'Learn More';
+                }
+            });
+
+            // Toggle the clicked one
+            details.classList.toggle('open');
+            button.textContent = isOpen ? 'Learn More' : 'Show Less';
+        }
+
         // Section switching
         function switchSection(section, element) {
             // Update nav tabs
