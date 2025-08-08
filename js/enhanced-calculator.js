@@ -687,8 +687,12 @@ function exportResults() {
 }
 
 function resetCalculator() {
-    document.getElementById('enhancedCalcForm')?.reset();
-    document.getElementById('enhancedResults')?.innerHTML = '';
+    const calcForm = document.getElementById('enhancedCalcForm');
+    if (calcForm) calcForm.reset();
+    
+    const resultsDiv = document.getElementById('enhancedResults');
+    if (resultsDiv) resultsDiv.innerHTML = '';
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
