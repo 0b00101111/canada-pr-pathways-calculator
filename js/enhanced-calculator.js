@@ -659,9 +659,12 @@ function updateChartScenarios() {
 }
 
 function exportResults() {
-    // Gather current form data for profile
-    const formData = gatherFormData();
-    const age = formData.dob ? AgeModule.calculateAge(formData.dob) : 'Not specified';
+    console.log('Export button clicked!'); // Debug log
+    
+    try {
+        // Gather current form data for profile
+        const formData = gatherFormData();
+        const age = formData.dob ? AgeModule.calculateAge(formData.dob) : 'Not specified';
     
     let exportText = '=== CANADA PR PATHWAYS CALCULATOR - DETAILED RESULTS ===\n';
     exportText += `Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}\n`;
@@ -760,6 +763,12 @@ function exportResults() {
     a.download = `CRS_Score_Report_${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+    
+    console.log('Export completed successfully!'); // Debug log
+    } catch (error) {
+        console.error('Export error:', error);
+        alert('Error exporting results. Please check the console for details.');
+    }
 }
 
 // Helper functions for formatting
