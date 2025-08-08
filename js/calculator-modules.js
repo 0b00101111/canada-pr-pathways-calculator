@@ -193,6 +193,11 @@ const ScenarioGenerator = {
     }
 };
 
+// Make AgeModule globally available
+if (typeof window !== 'undefined') {
+    window.AgeModule = AgeModule;
+}
+
 const RecommendationsModule = {
     generateRecommendations: function(scenarios, userData) {
         const recommendations = [];

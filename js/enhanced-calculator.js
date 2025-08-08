@@ -659,31 +659,130 @@ function updateChartScenarios() {
 }
 
 function exportResults() {
-    const scenarios = document.querySelectorAll('.scenario-card');
-    let exportText = '=== CANADA PR CALCULATOR RESULTS ===\n';
-    exportText += `Generated: ${new Date().toLocaleDateString()}\n\n`;
-
-    exportText += 'YOUR SCENARIOS:\n';
-    scenarios.forEach(card => {
-        const name = card.querySelector('h4')?.textContent || '';
-        const score = card.querySelector('.scenario-score')?.textContent || '';
-        const timeline = card.querySelector('.scenario-timeline')?.textContent || '';
-        exportText += `${name}: ${score} points (${timeline})\n`;
+    // Gather current form data for profile
+    const formData = gatherFormData();
+    const age = formData.dob ? AgeModule.calculateAge(formData.dob) : 'Not specified';
+    
+    let exportText = '=== CANADA PR PATHWAYS CALCULATOR - DETAILED RESULTS ===\n';
+    exportText += `Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}\n`;
+    exportText += '=' + '='.repeat(55) + '\n\n';
+    
+    // Profile Section
+    exportText += 'YOUR PROFILE:\n';
+    exportText += '-'.repeat(50) + '\n';
+    exportText += `Age: ${age}\n`;
+    exportText += `Marital Status: ${formData.married ? 'Married/Common-law' : 'Single'}\n`;
+    exportText += `Education: ${formatEducation(formData.completedEducation)}\n`;
+    exportText += `Canadian Education: ${formatCanadianEducation(formData.canadianEducation)}\n`;
+    exportText += `English Level: CLB ${formData.englishCLB || 'Not tested'}\n`;
+    exportText += `French Level: ${formData.frenchNCLC ? `NCLC ${formData.frenchNCLC}` : 'No French'}\n`;
+    exportText += `Foreign Work Experience: ${formData.foreignWork} year(s)\n`;
+    exportText += `Canadian Work Experience: ${formData.canadianWork} year(s)\n`;
+    exportText += `Sibling in Canada: ${formData.sibling ? 'Yes' : 'No'}\n`;
+    exportText += `Provincial Nomination: ${formData.pnp ? 'Yes (600 points!)' : 'No'}\n`;
+    
+    if (formData.married && formData.spouseEducation) {
+        exportText += '\nSPOUSE PROFILE:\n';
+        exportText += `Education: ${formatEducation(formData.spouseEducation)}\n`;
+        exportText += `English Level: CLB ${formData.spouseEnglish || 'Not tested'}\n`;
+        exportText += `Canadian Work: ${formData.spouseWork} year(s)\n`;
+    }
+    
+    exportText += '\n' + '='.repeat(55) + '\n\n';
+    
+    // Scenarios with detailed scores
+    exportText += 'CRS SCORE SCENARIOS:\n';
+    exportText += '-'.repeat(50) + '\n\n';
+    
+    currentScenarios.forEach((scenario, index) => {
+        exportText += `${index + 1}. ${scenario.name}\n`;
+        exportText += `   Score: ${scenario.score} points\n`;
+        exportText += `   Timeline: ${scenario.timeline}\n`;
+        exportText += `   Status: ${scenario.status}\n`;
+        if (scenario.improvements && scenario.improvements.length > 0) {
+            exportText += `   Key improvements: ${scenario.improvements.join(', ')}\n`;
+        }
+        exportText += '\n';
     });
-
-    exportText += '\nNEXT STEPS:\n';
-    exportText += '1. Take official language tests (IELTS/CELPIP for English, TEF/TCF for French)\n';
-    exportText += '2. Get Educational Credential Assessment (ECA) for foreign degrees\n';
-    exportText += '3. Create Express Entry profile when ready\n';
-    exportText += '4. Monitor draw scores and requirements\n';
-
+    
+    exportText += '='.repeat(55) + '\n\n';
+    
+    // Recommendations section
+    exportText += 'PERSONALIZED RECOMMENDATIONS:\n';
+    exportText += '-'.repeat(50) + '\n\n';
+    
+    // Get recommendations from the page
+    const recommendationElements = document.querySelectorAll('#enhancedResults .info-box');
+    recommendationElements.forEach((rec, index) => {
+        const title = rec.querySelector('h4')?.textContent || '';
+        const message = rec.querySelector('p')?.textContent || '';
+        exportText += `${index + 1}. ${title}\n`;
+        exportText += `   ${message.replace(/\n/g, '\n   ')}\n\n`;
+    });
+    
+    exportText += '='.repeat(55) + '\n\n';
+    
+    // Action items
+    exportText += 'IMMEDIATE ACTION ITEMS:\n';
+    exportText += '-'.repeat(50) + '\n';
+    exportText += '1. Language Tests:\n';
+    exportText += '   - Book IELTS/CELPIP (English) if not done\n';
+    exportText += '   - Consider TEF/TCF (French) for bonus points\n\n';
+    exportText += '2. Educational Credential Assessment (ECA):\n';
+    exportText += '   - Apply through WES, IQAS, or other designated organization\n';
+    exportText += '   - Processing time: 4-8 weeks\n\n';
+    exportText += '3. Create Express Entry Profile:\n';
+    exportText += '   - Once you have language tests and ECA\n';
+    exportText += '   - Profile valid for 12 months\n\n';
+    exportText += '4. Monitor Draw Scores:\n';
+    exportText += '   - General draws: Usually 480-530\n';
+    exportText += '   - French draws: Usually 350-430\n';
+    exportText += '   - CEC draws: Usually 500-550\n\n';
+    
+    exportText += '='.repeat(55) + '\n\n';
+    
+    // Disclaimer
+    exportText += 'IMPORTANT DISCLAIMER:\n';
+    exportText += '-'.repeat(50) + '\n';
+    exportText += 'This is an UNOFFICIAL calculator for educational purposes only.\n';
+    exportText += 'Immigration rules and requirements can change at any time.\n';
+    exportText += 'Always verify information with official IRCC sources at:\n';
+    exportText += 'https://www.canada.ca/en/immigration-refugees-citizenship.html\n\n';
+    exportText += 'For complex cases, consider consulting a Regulated Canadian\n';
+    exportText += 'Immigration Consultant (RCIC) or immigration lawyer.\n\n';
+    exportText += 'Calculator last updated: August 2025\n';
+    exportText += 'Based on current Express Entry CRS criteria\n';
+    
     const blob = new Blob([exportText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `CRS_Score_Timeline_${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `CRS_Score_Report_${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+// Helper functions for formatting
+function formatEducation(edu) {
+    const educationMap = {
+        'none': 'High school or less',
+        'diploma1': '1-year diploma/certificate',
+        'diploma2': '2-year diploma',
+        'bachelor': "Bachelor's degree",
+        'two-or-more': 'Two or more degrees',
+        'master': "Master's degree",
+        'phd': 'PhD'
+    };
+    return educationMap[edu] || edu;
+}
+
+function formatCanadianEducation(edu) {
+    const canadianEduMap = {
+        'none': 'None',
+        '1-2year': '1-2 year diploma',
+        '3year': '3+ year degree'
+    };
+    return canadianEduMap[edu] || edu;
 }
 
 function resetCalculator() {
