@@ -233,8 +233,8 @@ const RecommendationsModule = {
 
         if (isAbroad) {
             recommendations.push({
-                type: 'info', title: 'A Personal Recommendation: Study in Canada',
-                message: "While expensive, studying in Canada is a life-changing experience that provides a clear path to PR. You get to live in a beautiful country, build a network of friends, and understand the culture before you even apply. It's an investment in both your career and your new life. (Disclaimer: I'm currently a student here!)",
+                type: 'info', title: 'Strategic Tip: Consider Your Study Timing',
+                message: "Here's something many don't realize: if you can achieve French NCLC 7 relatively soon, consider getting PR first before studying in Canada. Why? The tuition difference is HUGE - we're talking about saving $20,000-40,000 per year! International students pay 3-4x more than PR holders. That said, if French isn't feasible for you, studying in Canada remains an excellent pathway - you'll gain Canadian credentials, build a professional network, and experience the culture firsthand. It's still a worthwhile investment, just a more expensive one. (Speaking from experience as a current international student who wishes someone had told me about the French option earlier!)",
                 priority: 3
             });
         }
