@@ -409,12 +409,6 @@ function initializeEnhancedCalculator(journey) {
             } else if (this.value === 'preparing') {
                 document.getElementById('englishPreparing').style.display = 'block';
             }
-            
-            // Update styling
-            this.parentElement.parentElement.querySelectorAll('.status-radio').forEach(label => {
-                label.classList.remove('selected');
-            });
-            this.parentElement.classList.add('selected');
         });
     });
     
@@ -432,12 +426,6 @@ function initializeEnhancedCalculator(journey) {
             } else if (this.value === 'planning') {
                 document.getElementById('frenchPlanning').style.display = 'block';
             }
-            
-            // Update styling
-            this.parentElement.parentElement.querySelectorAll('.status-radio').forEach(label => {
-                label.classList.remove('selected');
-            });
-            this.parentElement.classList.add('selected');
         });
     });
     
@@ -466,20 +454,6 @@ function initializeEnhancedCalculator(journey) {
         dobInput.max = maxDOB.toISOString().split('T')[0];
     }
     
-    // Set min dates for future events
-    const todayStr = today.toISOString().split('T')[0];
-    const todayMonth = today.toISOString().substring(0, 7);
-    
-    document.querySelectorAll('input[type="date"], input[type="month"]').forEach(input => {
-        if (input.id !== 'calc_dob') {
-            if (input.type === 'date') {
-                input.min = todayStr;
-            } else {
-                input.min = todayMonth;
-            }
-        }
-    });
-    
     // Pre-fill based on journey
     prefillByJourney(journey);
 }
@@ -504,15 +478,13 @@ function prefillByJourney(journey) {
     }
 }
 
-// Store user data globally for advanced analysis and charts
-let currentUserData = null;
+// Store user data globally for charts
 let currentScenarios = [];
 
 // Main calculation function
 function calculateEnhancedCRS() {
     const formData = gatherFormData();
 
-    // Create a simplified education data object directly
     const educationData = {
         current: formData.completedEducation,
         future: formData.currentlyStudying ? {
@@ -522,28 +494,13 @@ function calculateEnhancedCRS() {
         } : null
     };
 
-    // Create a simplified language data object directly from form values
-    const languageData = {};
-    const englishStatus = formData.englishStatus;
-    if (englishStatus === 'completed') {
-        languageData.english = { current: parseInt(formData.englishCLB) || 0, target: 0, targetDate: null };
-    } else if (englishStatus === 'booked') {
-        languageData.english = { current: 6, target: parseInt(formData.englishTargetCLB) || 9, targetDate: formData.englishTestDate };
-    } else if (englishStatus === 'preparing') {
-        languageData.english = { current: parseInt(formData.englishCurrentCLB) || 6, target: parseInt(formData.englishPreparingTarget) || 9, targetDate: formData.englishTargetDate };
-    } else {
-        languageData.english = { current: 0, target: 0, targetDate: null };
-    }
-
-    const frenchStatus = formData.frenchStatus;
-    if (frenchStatus === 'completed') {
-        languageData.french = { current: parseInt(formData.frenchNCLC) || 0, target: 0, targetDate: null };
-    } else if (frenchStatus === 'learning') {
-        languageData.french = { current: parseInt(formData.frenchCurrentLevel) || 0, target: 7, targetDate: formData.frenchTargetDate };
-    } else if (frenchStatus === 'planning') {
-        languageData.french = { current: 0, target: 7, targetDate: formData.frenchEstimatedDate };
-    } else {
-        languageData.french = { current: 0, target: 0, targetDate: null };
+    const languageData = {
+        english: { current: parseInt(formData.englishCLB) || 0, target: 0, targetDate: null },
+        french: { current: parseInt(formData.frenchNCLC) || 0, target: 0, targetDate: null }
+    };
+    if (document.querySelector('input[name="frenchStatus"]:checked')?.value !== 'none' && document.querySelector('input[name="frenchStatus"]:checked')?.value !== 'completed') {
+        languageData.french.target = 7;
+        languageData.french.targetDate = formData.frenchTargetDate || formData.frenchEstimatedDate;
     }
     
     const userData = {
@@ -563,7 +520,6 @@ function calculateEnhancedCRS() {
         } : null
     };
     
-    currentUserData = userData;
     currentScenarios = ScenarioGenerator.generateTimelineScenarios(userData);
     const recommendations = RecommendationsModule.generateRecommendations(currentScenarios, userData);
     
@@ -582,16 +538,9 @@ function gatherFormData() {
         studyingDegree: document.getElementById('calc_studying_degree')?.value,
         graduationDate: document.getElementById('calc_graduation_date')?.value,
         studyLocation: document.getElementById('calc_study_location')?.value,
-        englishStatus: document.querySelector('input[name="englishStatus"]:checked')?.value,
         englishCLB: document.getElementById('calc_english_clb')?.value,
-        englishTargetCLB: document.getElementById('calc_english_target')?.value,
-        englishTestDate: document.getElementById('calc_english_test_date')?.value,
-        englishCurrentCLB: document.getElementById('calc_english_current')?.value,
-        englishPreparingTarget: document.getElementById('calc_english_prep_target')?.value,
-        englishTargetDate: document.getElementById('calc_english_target_date')?.value,
         frenchStatus: document.querySelector('input[name="frenchStatus"]:checked')?.value,
         frenchNCLC: document.getElementById('calc_french_nclc')?.value,
-        frenchCurrentLevel: document.getElementById('calc_french_current')?.value,
         frenchTargetDate: document.getElementById('calc_french_target_date')?.value,
         frenchEstimatedDate: document.getElementById('calc_french_estimated')?.value,
         foreignWork: parseInt(document.getElementById('calc_foreign_work')?.value || 0),
@@ -605,7 +554,7 @@ function gatherFormData() {
 }
 
 // Display enhanced results
-function displayEnhancedResults(scenarios) {
+function displayEnhancedResults(scenarios, recommendations) {
     const resultsDiv = document.getElementById('enhancedResults');
     if (!resultsDiv) return;
     
@@ -653,7 +602,7 @@ function displayEnhancedResults(scenarios) {
         </div>
         
         <div style="margin-top: 30px;">
-            ${RecommendationsModule.generateRecommendations(scenarios, currentUserData).map(rec => `
+            ${recommendations.map(rec => `
                 <div class="info-box ${rec.type}">
                     <h4>${rec.title}</h4>
                     <p>${rec.message}</p>
@@ -710,11 +659,37 @@ function updateChartScenarios() {
 }
 
 function exportResults() {
-    // ... (rest of function)
+    const scenarios = document.querySelectorAll('.scenario-card');
+    let exportText = '=== CANADA PR CALCULATOR RESULTS ===\n';
+    exportText += `Generated: ${new Date().toLocaleDateString()}\n\n`;
+
+    exportText += 'YOUR SCENARIOS:\n';
+    scenarios.forEach(card => {
+        const name = card.querySelector('h4')?.textContent || '';
+        const score = card.querySelector('.scenario-score')?.textContent || '';
+        const timeline = card.querySelector('.scenario-timeline')?.textContent || '';
+        exportText += `${name}: ${score} points (${timeline})\n`;
+    });
+
+    exportText += '\nNEXT STEPS:\n';
+    exportText += '1. Take official language tests (IELTS/CELPIP for English, TEF/TCF for French)\n';
+    exportText += '2. Get Educational Credential Assessment (ECA) for foreign degrees\n';
+    exportText += '3. Create Express Entry profile when ready\n';
+    exportText += '4. Monitor draw scores and requirements\n';
+
+    const blob = new Blob([exportText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `CRS_Score_Timeline_${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 function resetCalculator() {
-    // ... (rest of function)
+    document.getElementById('enhancedCalcForm')?.reset();
+    document.getElementById('enhancedResults')?.innerHTML = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 const horizontalLinePlugin = {

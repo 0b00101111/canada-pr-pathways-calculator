@@ -50,7 +50,7 @@ const historicalDrawData = [
     { date: "2025-02-17", crsScore: 750, drawType: "PNP" },
     { date: "2025-02-19", crsScore: 428, drawType: "French Language" },
     { date: "2025-03-03", crsScore: 667, drawType: "PNP" },
-    { date: "205-03-06", crsScore: 410, drawType: "French Language" },
+    { date: "2025-03-06", crsScore: 410, drawType: "French Language" },
     { date: "2025-03-17", crsScore: 736, drawType: "PNP" },
     { date: "2025-03-21", crsScore: 379, drawType: "French Language" },
     { date: "2025-04-14", crsScore: 764, drawType: "PNP" },

@@ -122,6 +122,8 @@ const ScenarioGenerator = {
     generateTimelineScenarios: function(userData) {
         const scenarios = [];
         const today = new Date();
+        let latestDate = today;
+
         const baseData = {
             dob: userData.dob,
             married: userData.married,
@@ -136,7 +138,6 @@ const ScenarioGenerator = {
             pnp: userData.pnp
         };
         
-        // Scenario 1: Current Status
         scenarios.push({
             name: 'Current Status',
             date: today,
@@ -147,7 +148,6 @@ const ScenarioGenerator = {
         const hasFutureEducation = userData.education.future;
         const hasFutureFrench = userData.language.french.targetDate && userData.language.french.target > baseData.frenchNCLC;
 
-        // Scenario 2: After Graduation Only
         if (hasFutureEducation) {
             const gradDate = userData.education.future.graduationDate;
             const gradAge = AgeModule.getAgeOnDate(baseData.dob, gradDate);
@@ -156,9 +156,9 @@ const ScenarioGenerator = {
                 score: this.calculateCRSForScenario({ ...baseData, age: gradAge, education: userData.education.future.degree, canadianEducation: '3year' }),
                 timeline: this.formatDate(gradDate), status: 'in-progress', icon: '🎓', improvements: ['Higher education']
             });
+            latestDate = new Date(Math.max(latestDate, new Date(gradDate)));
         }
 
-        // Scenario 3: With French Only
         if (hasFutureFrench) {
             const frenchDate = userData.language.french.targetDate;
             const frenchAge = AgeModule.getAgeOnDate(baseData.dob, frenchDate);
@@ -167,18 +167,18 @@ const ScenarioGenerator = {
                 score: this.calculateCRSForScenario({ ...baseData, age: frenchAge, frenchNCLC: userData.language.french.target }),
                 timeline: this.formatDate(frenchDate), status: 'planned', icon: '🇫🇷', improvements: ['French proficiency']
             });
+            latestDate = new Date(Math.max(latestDate, new Date(frenchDate)));
         }
 
-        // Scenario 4: Graduation + French
         if (hasFutureEducation && hasFutureFrench) {
             const gradDate = new Date(userData.education.future.graduationDate);
             const frenchDate = new Date(userData.language.french.targetDate);
-            const latestDate = new Date(Math.max(gradDate, frenchDate));
-            const bestCaseAge = AgeModule.getAgeOnDate(baseData.dob, latestDate);
+            const bestCaseDate = new Date(Math.max(gradDate, frenchDate));
+            const bestCaseAge = AgeModule.getAgeOnDate(baseData.dob, bestCaseDate);
             scenarios.push({
-                name: 'Graduation + French', date: latestDate,
+                name: 'Graduation + French', date: bestCaseDate,
                 score: this.calculateCRSForScenario({ ...baseData, age: bestCaseAge, education: userData.education.future.degree, frenchNCLC: userData.language.french.target, canadianEducation: '3year' }),
-                timeline: this.formatDate(latestDate.toISOString().slice(0,10)), status: 'planned', icon: '🚀', improvements: ['French proficiency', 'Higher education']
+                timeline: this.formatDate(bestCaseDate.toISOString().slice(0,10)), status: 'planned', icon: '🚀', improvements: ['French proficiency', 'Higher education']
             });
         }
         
@@ -198,74 +198,66 @@ const RecommendationsModule = {
         const recommendations = [];
         const currentScore = scenarios.find(s => s.status === 'current')?.score || 0;
         const maxScore = Math.max(...scenarios.map(s => s.score));
-        
-        if (currentScore >= 500) {
+        const isStudyingInCanada = userData.education.future && userData.education.future.location === 'canada';
+        const isAbroad = !isStudyingInCanada && userData.canadianWork === 0;
+
+        const frenchScenario = scenarios.find(s => s.improvements.includes('French proficiency'));
+        const hasFrenchGoal = !!frenchScenario;
+
+        if (currentScore > 490) {
             recommendations.push({
-                type: 'success',
-                title: 'Excellent Score!',
-                message: 'Your current score is highly competitive. You should receive an invitation in the next Express Entry draw.',
+                type: 'success', title: 'Excellent Score!',
+                message: 'Your score is highly competitive for general Express Entry draws. You are in a strong position.',
                 priority: 1
             });
-        } else if (currentScore >= 470) {
+        }
+
+        if (hasFrenchGoal && frenchScenario.score > 440) {
             recommendations.push({
-                type: 'success',
-                title: 'Competitive Score',
-                message: 'Your score is competitive. Monitor upcoming draws closely - you\'re likely to receive an invitation soon.',
-                priority: 1
-            });
-        } else if (currentScore >= 440) {
-            recommendations.push({
-                type: 'warning',
-                title: 'Moderate Score',
-                message: 'Your score is moderate. Consider French language draws where the cutoff is typically much lower (350-430).',
+                type: 'info', title: 'Your Golden Ticket: The French Pathway',
+                message: `Achieving French NCLC 7 is your most powerful strategy. It makes you eligible for French-category draws, which have significantly lower CRS cutoffs. This is your most direct path to an invitation.`,
                 priority: 2
             });
-        } else {
+        } else if (!hasFrenchGoal && currentScore < 490) {
             recommendations.push({
-                type: 'info',
-                title: 'Score Improvement Needed',
-                message: `Focus on the improvements shown above to increase your score. You can potentially reach ${maxScore} points.`,
+                type: 'info', title: 'The Most Powerful Upgrade: Learn French',
+                message: 'Learning French is the single most effective way to boost your score. It adds significant bonus points and opens the door to French-category draws with much lower score requirements.',
+                priority: 2
+            });
+        }
+
+        if (isAbroad) {
+            recommendations.push({
+                type: 'info', title: 'A Personal Recommendation: Study in Canada',
+                message: "While expensive, studying in Canada is a life-changing experience that provides a clear path to PR. You get to live in a beautiful country, build a network of friends, and understand the culture before you even apply. It's an investment in both your career and your new life. (Disclaimer: I'm currently a student here!)",
                 priority: 3
             });
         }
-        
-        const hasFrench = scenarios.some(s => s.improvements.includes('French proficiency'));
-        if (!hasFrench && userData.language.french.current < 7) {
-            recommendations.push({
-                type: 'info',
-                title: 'Learn French for Major Boost',
-                message: 'Learning French to NCLC 7 is your single best investment. It adds 50+ points and qualifies you for French-targeted draws.',
-                priority: 2
+
+        if (!isAbroad && userData.canadianWork < 1) {
+             recommendations.push({
+                type: 'info', title: 'The Steady Path: Gain Canadian Experience',
+                message: 'After graduation, getting one year of skilled work experience in Canada is a very reliable path to PR. This will make you eligible for the Canadian Experience Class (CEC).',
+                priority: 4
             });
         }
-        
-        if (!userData.canadianEducation || userData.canadianEducation === 'none') {
+
+        if (!userData.pnp && maxScore < 480) {
             recommendations.push({
-                type: 'info',
-                title: 'Consider Canadian Education',
-                message: 'Studying in Canada provides 15-30 bonus points plus valuable Canadian experience and networking.',
-                priority: 3
+                type: 'info', title: 'Explore Provincial Nominee Programs (PNP)',
+                message: 'If your score remains below the federal draw cutoffs, securing a provincial nomination is a powerful alternative. A nomination adds 600 points to your score, guaranteeing an invitation.',
+                priority: 5
             });
         }
-        
-        if (userData.canadianWork === 0) {
-            recommendations.push({
-                type: 'info',
-                title: 'Canadian Experience is Valuable',
-                message: 'Even 1 year of Canadian work experience adds 40-80 points and makes you eligible for Canadian Experience Class.',
-                priority: 2
+
+        if (maxScore > currentScore && currentScore < 470) {
+             recommendations.push({
+                type: 'success', title: 'You Have a Clear Path Forward',
+                message: `Your current score may seem low, but you have a clear plan to increase it to a highly competitive level (${maxScore}). Focus on your goals--they are achievable and will make a huge difference.`,
+                priority: 6
             });
         }
-        
-        if (!userData.pnp && currentScore < 480) {
-            recommendations.push({
-                type: 'info',
-                title: 'Explore Provincial Nominee Programs',
-                message: 'PNP nomination adds 600 points, guaranteeing an invitation. Research programs in your field.',
-                priority: 2
-            });
-        }
-        
+
         return recommendations.sort((a, b) => a.priority - b.priority);
     }
 };
