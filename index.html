@@ -83,6 +83,85 @@
             line-height: 1.5;
         }
         
+        /* Hero CTA Button */
+        .hero-cta {
+            margin-top: 2rem;
+            display: inline-block;
+            background: white;
+            color: var(--primary-color);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Floating Action Button */
+        .floating-calc-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 99;
+            border: none;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .floating-calc-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(99, 102, 241, 0.5);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating-calc-btn .tooltip {
+            position: absolute;
+            right: 70px;
+            background: #333;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .floating-calc-btn:hover .tooltip {
+            opacity: 1;
+        }
+        
         /* Navigation */
         .nav-tabs {
             background: var(--card-background);
@@ -1043,6 +1122,9 @@
     <div class="header">
         <h1>🍁 Canada PR Pathways Calculator</h1>
         <p>Understand Canadian immigration, calculate your score, and discover your pathway to permanent residence</p>
+        <button class="hero-cta" onclick="quickStartCalculator()">
+            🎯 Calculate My CRS Score Now
+        </button>
     </div>
     
     <div class="nav-tabs">
@@ -1060,6 +1142,61 @@
                 <h2>Welcome to Your Canadian Immigration Journey!</h2>
                 <p>If you're confused by terms like "Express Entry," "CRS," or "PNP," you're not alone. The Canadian immigration system can be complex, but this tool is here to help.</p>
                 <p>This calculator focuses on the <strong>Express Entry system</strong>, the main pathway for skilled workers. For a broader look at all immigration options, check out the overview on the Resources tab. Remember to always consult official IRCC resources for the most accurate information.</p>
+            </div>
+            
+            <!-- Real Example Showcase - MOVED TO TOP -->
+            <div style="background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%); border-radius: 20px; padding: 40px; margin: 40px 0; border: 2px solid #e2e8f0;">
+                <h3 style="color: #2d3748; margin-bottom: 20px; font-size: 1.8em; text-align: center;">🌟 See How Sam Discovered His Best Immigration Strategy</h3>
+                <p style="color: #4a5568; margin-bottom: 30px; font-size: 1.1em; text-align: center;">Sam is a current student in Canada. Here's how our calculator helped him map out his journey from 425 to 512 points!</p>
+                
+                <!-- Example Calculator Results -->
+                <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 30px;">
+                    <h4 style="text-align: center; color: #2d3748; margin-bottom: 25px; font-size: 1.5em;">Sam's CRS Score Timeline</h4>
+                    
+                    <!-- Timeline Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                        <div style="background: #f7fafc; border-radius: 12px; padding: 20px; border: 2px solid #c6f6d5; position: relative;">
+                            <span style="background: #c6f6d5; color: #22543d; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">Current</span>
+                            <h5 style="color: #2d3748; margin: 15px 0 10px; font-size: 1.1em;">📍 Current Status</h5>
+                            <p style="font-size: 2.5em; font-weight: bold; color: #e53e3e; margin: 10px 0;">425</p>
+                            <p style="color: #718096; font-size: 0.9em;">📅 Today</p>
+                        </div>
+                        
+                        <div style="background: #f7fafc; border-radius: 12px; padding: 20px; border: 2px solid #bee3f8;">
+                            <span style="background: #bee3f8; color: #2c5282; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">Planned</span>
+                            <h5 style="color: #2d3748; margin: 15px 0 10px; font-size: 1.1em;">🇫🇷 With French NCLC 7</h5>
+                            <p style="font-size: 2.5em; font-weight: bold; color: #ed8936; margin: 10px 0;">482</p>
+                            <p style="color: #718096; font-size: 0.9em;">📅 Nov 2026</p>
+                        </div>
+                        
+                        <div style="background: #f7fafc; border-radius: 12px; padding: 20px; border: 2px solid #fed7aa;">
+                            <span style="background: #fed7aa; color: #7c2d12; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">In-progress</span>
+                            <h5 style="color: #2d3748; margin: 15px 0 10px; font-size: 1.1em;">🎓 After Graduation</h5>
+                            <p style="font-size: 2.5em; font-weight: bold; color: #ed8936; margin: 10px 0;">450</p>
+                            <p style="color: #718096; font-size: 0.9em;">📅 Dec 2026</p>
+                        </div>
+                        
+                        <div style="background: #f7fafc; border-radius: 12px; padding: 20px; border: 2px solid #bee3f8;">
+                            <span style="background: #bee3f8; color: #2c5282; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">Planned</span>
+                            <h5 style="color: #2d3748; margin: 15px 0 10px; font-size: 1.1em;">🚀 Graduation + French</h5>
+                            <p style="font-size: 2.5em; font-weight: bold; color: #48bb78; margin: 10px 0;">512</p>
+                            <p style="color: #718096; font-size: 0.9em;">📅 Dec 2026</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Insights -->
+                    <div style="background: #f0fff4; border-radius: 10px; padding: 20px; border-left: 4px solid #48bb78;">
+                        <h5 style="color: #22543d; margin-bottom: 10px;">💡 Sam's Key Discovery:</h5>
+                        <p style="color: #2d3748; line-height: 1.6;">By learning French while completing his studies, Sam can reach <strong>512 points</strong> - well above the typical requirement! The calculator showed him that French gives him <strong>57 extra points</strong> and access to special French-speaker draws with much lower cutoffs (380-430 vs 480-530).</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <p style="color: #4a5568; margin-bottom: 20px; font-size: 1.1em;">Ready to discover YOUR best pathway to Canadian PR?</p>
+                    <button class="hero-cta" onclick="quickStartCalculator()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        Calculate Your Score & Timeline Now →
+                    </button>
+                </div>
             </div>
             
             <h2 style="margin: 40px 0 30px; color: #2d3748; font-size: 1.8em;">Key Terms You Need to Know</h2>
@@ -1639,10 +1776,40 @@
             tryLoad();
         }
         
+        // Quick start calculator function
+        function quickStartCalculator() {
+            // Switch to calculator tab
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector('.nav-tab:nth-child(3)').classList.add('active');
+            
+            // Show calculator section
+            document.querySelectorAll('.content-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById('calculatorSection').classList.add('active');
+            
+            // Auto-start the calculator
+            setTimeout(() => {
+                startCalculator();
+                // Smooth scroll to calculator
+                document.getElementById('calculatorSection').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }, 100);
+        }
+        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded, calculator ready');
         });
     </script>
+    <!-- Floating Calculator Button -->
+    <button class="floating-calc-btn" onclick="quickStartCalculator()" aria-label="Quick Calculator">
+        🧮
+        <span class="tooltip">Calculate CRS Score</span>
+    </button>
 </body>
 </html>

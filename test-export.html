@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Export Function</title>
+</head>
+<body>
+    <h1>Export Function Test</h1>
+    <button onclick="testExport()">Test Export</button>
+    
+    <script>
+        function testExport() {
+            console.log("Export button clicked!");
+            
+            try {
+                const exportText = "Test export content\nLine 2\nLine 3";
+                const blob = new Blob([exportText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'test-export.txt';
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                console.log("Export completed successfully!");
+            } catch (error) {
+                console.error("Export error:", error);
+            }
+        }
+    </script>
+</body>
+</html>
