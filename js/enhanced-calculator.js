@@ -586,9 +586,9 @@ function displayEnhancedResults(scenarios, recommendations) {
                             📅 ${scenario.timeline}
                         </div>
                         ${scenario.status !== 'current' ? `
-                        <div class="checkbox-group" style="margin-top: 15px;">
-                            <input type="checkbox" id="compare-scenario-${index}" onchange="updateChartScenarios()" data-score="${scenario.score}" data-label="${scenario.name.replace(/"/g, '&quot;')}" data-is-french="${scenario.improvements.includes('French proficiency')}">
-                            <label for="compare-scenario-${index}" style="margin: 0;">Compare on Chart</label>
+                        <div class="checkbox-group" style="margin-top: 10px; padding: 8px; font-size: 0.85em;">
+                            <input type="checkbox" id="compare-scenario-${index}" onchange="updateChartScenarios()" data-score="${scenario.score}" data-label="${scenario.name.replace(/"/g, '&quot;')}" data-is-french="${scenario.improvements.includes('French proficiency')}" style="width: 16px; height: 16px;">
+                            <label for="compare-scenario-${index}" style="margin: 0; font-size: 0.9em;">Compare on Chart</label>
                         </div>
                         ` : ''}
                     </div>
