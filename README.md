@@ -2,7 +2,7 @@
 
 A comprehensive, free, and open-source tool to help individuals understand Canadian immigration pathways and calculate their Express Entry Comprehensive Ranking System (CRS) score.
 
-🌐 **Live Demo**: [View the Calculator](https://0b00101111.github.io/canada-pr-pathways-calculator/)
+🌐 **Live Demo**: [View the Calculator](https://pr-calc.samwu.dev/)
 
 ## 🌟 Features
 
