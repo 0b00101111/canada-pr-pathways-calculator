@@ -41,15 +41,37 @@ const WorkExperienceModule = {
         const points = isWithSpouse ? [0, 35, 46, 56, 63, 70] : [0, 40, 53, 64, 72, 80];
         return points[Math.min(years, 5)] || 0;
     },
-    calculateSkillTransferability: (education, foreignWork, langCLB) => {
+    calculateSkillTransferability: (education, foreignWork, langCLB, canadianWork = 0) => {
         let points = 0;
-        const hasDegree = ['bachelor', 'two-or-more', 'master', 'phd'].includes(education);
         
-        if (hasDegree) {
-            if (langCLB >= 9) points += 50;
+        // Education + Language transferability
+        // According to IRCC, bachelor's alone gets lower points than multiple credentials or higher degrees
+        if (education === 'diploma1' || education === 'diploma2' || education === 'bachelor') {
+            // Single post-secondary credential (including bachelor's)
+            if (langCLB >= 9) points += 25;  // Max 25 points for single credential
+            else if (langCLB >= 7) points += 13;
+        } else if (education === 'two-or-more' || education === 'master' || education === 'phd') {
+            // Multiple credentials OR Master's/PhD
+            if (langCLB >= 9) points += 50;  // Max 50 points for multiple or advanced degrees
             else if (langCLB >= 7) points += 25;
         }
+        
+        // Education + Canadian Work Experience transferability
+        if (canadianWork >= 2) {
+            if (education === 'diploma1' || education === 'diploma2' || education === 'bachelor') {
+                points += 25;  // Single credential + 2+ years Canadian work
+            } else if (education === 'two-or-more' || education === 'master' || education === 'phd') {
+                points += 50;  // Multiple/advanced + 2+ years Canadian work
+            }
+        } else if (canadianWork >= 1) {
+            if (education === 'diploma1' || education === 'diploma2' || education === 'bachelor') {
+                points += 13;  // Single credential + 1 year Canadian work
+            } else if (education === 'two-or-more' || education === 'master' || education === 'phd') {
+                points += 25;  // Multiple/advanced + 1 year Canadian work
+            }
+        }
 
+        // Foreign Work Experience + Language transferability
         if (foreignWork >= 3) {
             if (langCLB >= 9) points += 50;
             else if (langCLB >= 7) points += 25;
@@ -57,6 +79,14 @@ const WorkExperienceModule = {
             if (langCLB >= 9) points += 25;
             else if (langCLB >= 7) points += 13;
         }
+        
+        // Foreign Work + Canadian Work transferability
+        if (foreignWork >= 3 && canadianWork >= 1) {
+            points += 50;
+        } else if (foreignWork >= 1 && canadianWork >= 1) {
+            points += 25;
+        }
+        
         return Math.min(points, 100);
     }
 };
@@ -111,7 +141,7 @@ const ScenarioGenerator = {
         score += LanguageModule.calculateLanguagePoints(data.englishCLB, data.frenchNCLC, data.married);
         score += WorkExperienceModule.calculateCanadianWorkPoints(data.canadianWork, data.married);
         score += SpouseModule.calculateSpousePoints(data.spouse);
-        score += WorkExperienceModule.calculateSkillTransferability(data.education, data.foreignWork, data.englishCLB);
+        score += WorkExperienceModule.calculateSkillTransferability(data.education, data.foreignWork, data.englishCLB, data.canadianWork);
         score += EducationModule.getCanadianEducationBonus(data.canadianEducation);
         score += LanguageModule.getFrenchBonus(data.englishCLB, data.frenchNCLC);
         if (data.sibling) score += 15;
