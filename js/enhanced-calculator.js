@@ -47,7 +47,15 @@ function getEnhancedCalculatorHTML(journey) {
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Spouse's English Level</label>
+                                    <label>Spouse's Language Test Status</label>
+                                    <select id="calc_spouse_lang_status" onchange="toggleSpouseLanguageDetails()">
+                                        <option value="none">No test taken/planned</option>
+                                        <option value="completed">Test completed</option>
+                                        <option value="planned">Planning to take test</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="spouse_current_lang_group" style="display: none;">
+                                    <label>Spouse's Current English Level</label>
                                     <select id="calc_spouse_english">
                                         <option value="0">No test</option>
                                         <option value="4">CLB 4-5</option>
@@ -55,6 +63,26 @@ function getEnhancedCalculatorHTML(journey) {
                                         <option value="7">CLB 7-8</option>
                                         <option value="9">CLB 9+</option>
                                     </select>
+                                </div>
+                                <div class="form-group" id="spouse_lang_type_group" style="display: none;">
+                                    <label>Language Test Type</label>
+                                    <select id="calc_spouse_lang_type">
+                                        <option value="english">English (IELTS/CELPIP)</option>
+                                        <option value="french">French (TEF/TCF)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="spouse_target_lang_group" style="display: none;">
+                                    <label>Spouse's Target Level</label>
+                                    <select id="calc_spouse_target_level">
+                                        <option value="4">CLB/NCLC 4-5 (4 points)</option>
+                                        <option value="6">CLB/NCLC 6 (8 points)</option>
+                                        <option value="7" selected>CLB/NCLC 7-8 (12 points)</option>
+                                        <option value="9">CLB/NCLC 9+ (20 points)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="spouse_lang_date_group" style="display: none;">
+                                    <label>Expected Test Date</label>
+                                    <input type="month" id="calc_spouse_lang_date">
                                 </div>
                                 <div class="form-group">
                                     <label>Spouse's Canadian Work</label>
@@ -322,24 +350,50 @@ function calculateEnhancedCRS() {
         }
     };
     
-    // Handle English planned tests
-    if (formData.englishStatus === 'planned' && formData.languageData?.english) {
-        // For planned tests, current is 0 (or lower estimate), target is the planned score
-        languageData.english.current = 0; // They haven't taken the test yet
-        languageData.english.target = formData.languageData.english.score || 7; // Their planned CLB level
-        languageData.english.targetDate = formData.languageData.english.targetDate;
-    } else if (formData.englishStatus === 'completed') {
+    // Handle English tests
+    if (formData.englishStatus === 'completed') {
         // For completed tests, use the score as current
         languageData.english.current = parseInt(formData.englishCLB) || 0;
+    } else if (formData.englishStatus === 'planned' && formData.languageData?.english) {
+        // For planned first-time tests, current is 0, target is the planned score
+        languageData.english.current = 0;
+        languageData.english.target = formData.languageData.english.score || 7;
+        languageData.english.targetDate = formData.languageData.english.targetDate;
+    } else if (formData.englishStatus === 'improving' && formData.languageData?.english) {
+        // For improvement plans, keep current score and set higher target
+        languageData.english.current = formData.languageData.english.currentScore || parseInt(formData.englishCLB) || 0;
+        languageData.english.target = formData.languageData.english.score || 9;
+        languageData.english.targetDate = formData.languageData.english.targetDate;
     }
     
-    // Handle French planned tests
-    if (formData.frenchStatus === 'planned' && formData.languageData?.french) {
-        languageData.french.current = 0; // They haven't taken the test yet
+    // Handle French tests
+    if (formData.frenchStatus === 'completed') {
+        // For completed tests, use the score as current
+        languageData.french.current = parseInt(formData.frenchNCLC) || 0;
+    } else if (formData.frenchStatus === 'planned' && formData.languageData?.french) {
+        // For planned first-time tests, current is 0, target is the planned score
+        languageData.french.current = 0;
         languageData.french.target = formData.languageData.french.score || 7;
         languageData.french.targetDate = formData.languageData.french.targetDate;
-    } else if (formData.frenchStatus === 'completed') {
-        languageData.french.current = parseInt(formData.frenchNCLC) || 0;
+    } else if (formData.frenchStatus === 'improving' && formData.languageData?.french) {
+        // For improvement plans, keep current score and set higher target
+        languageData.french.current = formData.languageData.french.currentScore || parseInt(formData.frenchNCLC) || 0;
+        languageData.french.target = formData.languageData.french.score || 7;
+        languageData.french.targetDate = formData.languageData.french.targetDate;
+    }
+    
+    // Build spouse data with language timeline if applicable
+    let spouseData = null;
+    if (formData.married) {
+        spouseData = {
+            education: formData.spouseEducation,
+            englishCLB: parseInt(formData.spouseEnglish) || 0,
+            canadianWork: parseInt(formData.spouseWork) || 0,
+            languageStatus: formData.spouseLangStatus,
+            langType: formData.spouseLangType || 'english',
+            targetLevel: parseInt(formData.spouseTargetLevel) || 0,
+            langDate: formData.spouseLangDate
+        };
     }
     
     const userData = {
@@ -352,11 +406,7 @@ function calculateEnhancedCRS() {
         canadianEducation: formData.canadianEducation,
         sibling: formData.sibling,
         pnp: formData.pnp,
-        spouse: formData.married ? {
-            education: formData.spouseEducation,
-            englishCLB: parseInt(formData.spouseEnglish) || 0,
-            canadianWork: parseInt(formData.spouseWork) || 0
-        } : null
+        spouse: spouseData
     };
     
     // Store data for recalculation
@@ -383,6 +433,21 @@ function gatherFormData() {
     const frenchNCLC = languageData?.french?.score || 
                        document.getElementById('calc_french_nclc')?.value || 0;
     
+    // Get spouse language status
+    const spouseLangStatus = document.getElementById('calc_spouse_lang_status')?.value || 'none';
+    let spouseEnglish = 0;
+    let spouseTargetLevel = 0;
+    let spouseLangType = 'english';
+    let spouseLangDate = null;
+    
+    if (spouseLangStatus === 'completed') {
+        spouseEnglish = document.getElementById('calc_spouse_english')?.value || 0;
+    } else if (spouseLangStatus === 'planned') {
+        spouseLangType = document.getElementById('calc_spouse_lang_type')?.value || 'english';
+        spouseTargetLevel = document.getElementById('calc_spouse_target_level')?.value || 0;
+        spouseLangDate = document.getElementById('calc_spouse_lang_date')?.value || null;
+    }
+    
     return {
         dob: document.getElementById('calc_dob')?.value,
         married: document.getElementById('calc_marital')?.value === 'married',
@@ -404,7 +469,11 @@ function gatherFormData() {
         sibling: document.getElementById('calc_sibling')?.checked,
         pnp: document.getElementById('calc_pnp')?.checked,
         spouseEducation: document.getElementById('calc_spouse_edu')?.value,
-        spouseEnglish: document.getElementById('calc_spouse_english')?.value,
+        spouseEnglish: spouseEnglish,
+        spouseLangStatus: spouseLangStatus,
+        spouseLangType: spouseLangType,
+        spouseTargetLevel: spouseTargetLevel,
+        spouseLangDate: spouseLangDate,
         spouseWork: document.getElementById('calc_spouse_work')?.value
     };
 }
@@ -841,6 +910,15 @@ function recalculateWithSelection() {
         modifiedUserData.education.future = null;
     }
     
+    if (excludedTypes.includes('spouse-language')) {
+        // Remove spouse language test plans
+        if (modifiedUserData.spouse) {
+            modifiedUserData.spouse.languageStatus = 'none';
+            modifiedUserData.spouse.targetLevel = 0;
+            modifiedUserData.spouse.langDate = null;
+        }
+    }
+    
     // Regenerate scenarios with modified data for score calculation
     const recalculatedScenarios = ScenarioGenerator.generateTimelineScenarios(modifiedUserData);
     
@@ -918,6 +996,34 @@ function renderInitialChart(scenarios, recommendations) {
     }));
     
     renderCRSChart(scenariosToCompare, pnpSelected, pathwayType);
+}
+
+// Toggle spouse language test details visibility
+function toggleSpouseLanguageDetails() {
+    const status = document.getElementById('calc_spouse_lang_status')?.value;
+    const currentGroup = document.getElementById('spouse_current_lang_group');
+    const typeGroup = document.getElementById('spouse_lang_type_group');
+    const targetGroup = document.getElementById('spouse_target_lang_group');
+    const dateGroup = document.getElementById('spouse_lang_date_group');
+    
+    if (!currentGroup || !targetGroup || !dateGroup || !typeGroup) return;
+    
+    if (status === 'completed') {
+        currentGroup.style.display = 'block';
+        typeGroup.style.display = 'none';
+        targetGroup.style.display = 'none';
+        dateGroup.style.display = 'none';
+    } else if (status === 'planned') {
+        currentGroup.style.display = 'none';
+        typeGroup.style.display = 'block';
+        targetGroup.style.display = 'block';
+        dateGroup.style.display = 'block';
+    } else {
+        currentGroup.style.display = 'none';
+        typeGroup.style.display = 'none';
+        targetGroup.style.display = 'none';
+        dateGroup.style.display = 'none';
+    }
 }
 
 // Automatically update chart based on scenario selection

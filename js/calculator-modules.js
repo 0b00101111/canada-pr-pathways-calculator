@@ -122,12 +122,34 @@ const SpouseModule = {
     calculateSpousePoints: (spouse) => {
         if (!spouse) return 0;
         const eduPoints = {'bachelor': 8, 'master': 10, 'phd': 10};
-        const langPoints = {4:4, 5:4, 6:8, 7:12, 8:12, 9:20, 10:20};
+        // Language points per ability (× 4 for all four abilities)
+        const langPointsPerAbility = {
+            0: 0,    // CLB/NCLC < 4
+            4: 1,    // CLB/NCLC 4-6
+            5: 1,    // CLB/NCLC 5-6
+            6: 1,    // CLB/NCLC 6
+            7: 3,    // CLB/NCLC 7-8
+            8: 3,    // CLB/NCLC 8
+            9: 5,    // CLB/NCLC 9+
+            10: 5    // CLB/NCLC 10
+        };
         const workPoints = {1:5, 2:7, 3:10, 4:10, 5:10};
 
         let total = 0;
         total += eduPoints[spouse.education] || 0;
-        total += langPoints[spouse.englishCLB] || 0;
+        
+        // Calculate language points - spouse gets points for first official language (English OR French)
+        // Priority: English if available, otherwise French
+        let langScore = 0;
+        if (spouse.englishCLB && spouse.englishCLB > 0) {
+            // English as first official language
+            langScore = (langPointsPerAbility[spouse.englishCLB] || 0) * 4;
+        } else if (spouse.frenchNCLC && spouse.frenchNCLC > 0) {
+            // French as first official language (if no English)
+            langScore = (langPointsPerAbility[spouse.frenchNCLC] || 0) * 4;
+        }
+        total += langScore;
+        
         total += workPoints[spouse.canadianWork] || 0;
         return total;
     }
@@ -187,6 +209,12 @@ const ScenarioGenerator = {
         
         // Check for future education
         const hasFutureEducation = userData.education.future;
+        
+        // Check for spouse language test
+        const hasSpouseLanguageTest = userData.spouse && 
+                                     userData.spouse.languageStatus === 'planned' && 
+                                     userData.spouse.targetLevel > 0 && 
+                                     userData.spouse.langDate;
 
         // Create an array of all future events with dates for proper chronological ordering
         const futureEvents = [];
@@ -223,6 +251,19 @@ const ScenarioGenerator = {
                 dateStr: gradDateStr,
                 degree: userData.education.future.degree,
                 location: userData.education.future.location
+            });
+        }
+        
+        if (hasSpouseLanguageTest) {
+            const spouseLangDateStr = userData.spouse.langDate.includes('-') && userData.spouse.langDate.split('-').length === 3 
+                ? userData.spouse.langDate 
+                : userData.spouse.langDate + '-15';
+            futureEvents.push({
+                type: 'spouse-language',
+                date: new Date(spouseLangDateStr),
+                dateStr: spouseLangDateStr,
+                langType: userData.spouse.langType || 'english',
+                target: userData.spouse.targetLevel
             });
         }
         
@@ -290,6 +331,39 @@ const ScenarioGenerator = {
                     icon: '🎓',
                     improvements: improvements,
                     type: 'education'
+                });
+            } else if (event.type === 'spouse-language') {
+                // Update spouse language score based on language type
+                // Spouse gets points for their first official language (English OR French)
+                if (event.langType === 'english') {
+                    cumulativeData.spouse = {
+                        ...cumulativeData.spouse,
+                        englishCLB: event.target,
+                        frenchNCLC: cumulativeData.spouse.frenchNCLC || 0
+                    };
+                } else if (event.langType === 'french') {
+                    cumulativeData.spouse = {
+                        ...cumulativeData.spouse,
+                        frenchNCLC: event.target,
+                        englishCLB: cumulativeData.spouse.englishCLB || 0
+                    };
+                }
+                
+                const langName = event.langType === 'french' ? 'French NCLC' : 'English CLB';
+                improvements.push(`Spouse ${event.langType} improvement`);
+                
+                scenarios.push({
+                    name: `Spouse ${langName} ${event.target} Achieved`,
+                    date: event.date,
+                    score: this.calculateCRSForScenario({ 
+                        ...cumulativeData, 
+                        age: eventAge
+                    }),
+                    timeline: this.formatDate(event.dateStr),
+                    status: 'planned',
+                    icon: '💑',
+                    improvements: improvements,
+                    type: 'spouse-language'
                 });
             }
             
