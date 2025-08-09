@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Calculator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        #console {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #0f0;
+        }
+        .error {
+            color: #f00;
+            border-left-color: #f00;
+        }
+        .info {
+            color: #00f;
+            border-left-color: #00f;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug: Calculator Issues</h1>
+    
+    <div id="calculator-container"></div>
+    
+    <div id="console">
+        <div class="log-entry info">Console initialized...</div>
+    </div>
+    
+    <!-- Load all required scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/draw-data.js"></script>
+    <script src="js/calculator-modules.js"></script>
+    <script src="js/language-ui-enhanced.js"></script>
+    <script src="js/enhanced-calculator.js"></script>
+    
+    <script>
+        // Override console.log and console.error to display in our debug console
+        const debugConsole = document.getElementById('console');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function addLogEntry(message, type = 'log') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            debugConsole.appendChild(entry);
+            debugConsole.scrollTop = debugConsole.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLogEntry(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLogEntry(args.join(' '), 'error');
+        };
+        
+        // Catch all errors
+        window.addEventListener('error', function(e) {
+            addLogEntry(`ERROR: ${e.message} at ${e.filename}:${e.lineno}:${e.colno}`, 'error');
+        });
+        
+        // Wait for DOM to load
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, checking modules...');
+            
+            // Check if all modules loaded
+            const modules = [
+                { name: 'Chart.js', check: typeof Chart !== 'undefined' },
+                { name: 'historicalDrawData', check: typeof historicalDrawData !== 'undefined' },
+                { name: 'EducationModule', check: typeof EducationModule !== 'undefined' },
+                { name: 'LanguageModule', check: typeof LanguageModule !== 'undefined' },
+                { name: 'WorkExperienceModule', check: typeof WorkExperienceModule !== 'undefined' },
+                { name: 'AgeModule', check: typeof AgeModule !== 'undefined' },
+                { name: 'ScenarioGenerator', check: typeof ScenarioGenerator !== 'undefined' },
+                { name: 'RecommendationsModule', check: typeof RecommendationsModule !== 'undefined' },
+                { name: 'LanguageUIEnhanced', check: typeof LanguageUIEnhanced !== 'undefined' },
+                { name: 'getEnhancedCalculatorHTML', check: typeof getEnhancedCalculatorHTML !== 'undefined' },
+                { name: 'initializeEnhancedCalculator', check: typeof initializeEnhancedCalculator !== 'undefined' },
+                { name: 'calculateEnhancedCRS', check: typeof calculateEnhancedCRS !== 'undefined' }
+            ];
+            
+            let allLoaded = true;
+            modules.forEach(module => {
+                if (module.check) {
+                    console.log(`✅ ${module.name} loaded`);
+                } else {
+                    console.error(`❌ ${module.name} NOT loaded`);
+                    allLoaded = false;
+                }
+            });
+            
+            if (allLoaded) {
+                console.log('All modules loaded successfully! Initializing calculator...');
+                
+                try {
+                    // Load calculator HTML
+                    const container = document.getElementById('calculator-container');
+                    const calculatorHTML = getEnhancedCalculatorHTML('studying');
+                    container.innerHTML = calculatorHTML;
+                    console.log('Calculator HTML loaded');
+                    
+                    // Initialize the calculator
+                    initializeEnhancedCalculator('studying');
+                    console.log('Calculator initialized');
+                    
+                    // Override the calculateEnhancedCRS to add logging
+                    const originalCalculate = window.calculateEnhancedCRS;
+                    window.calculateEnhancedCRS = function() {
+                        console.log('Calculate button clicked!');
+                        try {
+                            // Check if required fields are filled
+                            const dob = document.getElementById('calc_dob')?.value;
+                            if (!dob) {
+                                console.error('Date of birth is required!');
+                                alert('Please enter your date of birth');
+                                return;
+                            }
+                            
+                            console.log('Calling original calculateEnhancedCRS...');
+                            originalCalculate();
+                            console.log('Calculation completed');
+                        } catch (error) {
+                            console.error('Error in calculateEnhancedCRS:', error.message);
+                            console.error('Stack trace:', error.stack);
+                        }
+                    };
+                    
+                    console.log('Debug setup complete. Try clicking the Calculate button.');
+                    
+                } catch (error) {
+                    console.error('Error initializing calculator:', error.message);
+                    console.error('Stack trace:', error.stack);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

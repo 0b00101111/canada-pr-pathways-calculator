@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Checkbox Synchronization</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Checkbox Synchronization Test</h1>
+        
+        <div id="test-status"></div>
+        
+        <div style="margin-top: 20px;">
+            <h2>Test Actions:</h2>
+            <button onclick="simulateRecalculation()">Simulate Recalculation</button>
+            <button onclick="testCheckboxStates()">Test Checkbox States</button>
+            <button onclick="clearTest()">Clear</button>
+        </div>
+        
+        <div id="test-output" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // Simulate the checkbox state tracking
+        function simulateRecalculation() {
+            const statusDiv = document.getElementById('test-status');
+            const outputDiv = document.getElementById('test-output');
+            
+            // Create mock checkboxes
+            const mockHTML = `
+                <h3>Mock Scenario Cards:</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+                        <h4>English CLB 9</h4>
+                        <input type="checkbox" id="include-0" class="include-checkbox" 
+                               checked data-scenario-type="english" 
+                               onchange="trackChange(this)">
+                        <label for="include-0">Include in calculation</label>
+                    </div>
+                    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+                        <h4>French NCLC 7</h4>
+                        <input type="checkbox" id="include-1" class="include-checkbox" 
+                               checked data-scenario-type="french"
+                               onchange="trackChange(this)">
+                        <label for="include-1">Include in calculation</label>
+                    </div>
+                    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+                        <h4>After Graduation</h4>
+                        <input type="checkbox" id="include-2" class="include-checkbox" 
+                               checked data-scenario-type="education"
+                               onchange="trackChange(this)">
+                        <label for="include-2">Include in calculation</label>
+                    </div>
+                </div>
+            `;
+            
+            outputDiv.innerHTML = mockHTML;
+            
+            statusDiv.innerHTML = '<div class="status info">Mock checkboxes created. Try unchecking some and clicking "Test Checkbox States".</div>';
+        }
+        
+        function trackChange(checkbox) {
+            const statusDiv = document.getElementById('test-status');
+            statusDiv.innerHTML = `<div class="status info">Checkbox for ${checkbox.dataset.scenarioType} changed to: ${checkbox.checked}</div>`;
+        }
+        
+        function testCheckboxStates() {
+            const statusDiv = document.getElementById('test-status');
+            const includeCheckboxes = document.querySelectorAll('.include-checkbox');
+            
+            if (includeCheckboxes.length === 0) {
+                statusDiv.innerHTML = '<div class="status error">No checkboxes found. Click "Simulate Recalculation" first.</div>';
+                return;
+            }
+            
+            // Store states by type (new method)
+            const checkboxStatesByType = {};
+            includeCheckboxes.forEach(checkbox => {
+                if (checkbox.dataset.scenarioType) {
+                    checkboxStatesByType[checkbox.dataset.scenarioType] = checkbox.checked;
+                }
+            });
+            
+            // Store states by index (old method)
+            const checkboxStatesByIndex = {};
+            includeCheckboxes.forEach((checkbox, index) => {
+                checkboxStatesByIndex[index] = checkbox.checked;
+            });
+            
+            // Display the states
+            let output = '<h3>Stored States Comparison:</h3>';
+            output += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">';
+            
+            output += '<div>';
+            output += '<h4>✅ New Method (by type):</h4>';
+            output += '<pre>' + JSON.stringify(checkboxStatesByType, null, 2) + '</pre>';
+            output += '</div>';
+            
+            output += '<div>';
+            output += '<h4>❌ Old Method (by index):</h4>';
+            output += '<pre>' + JSON.stringify(checkboxStatesByIndex, null, 2) + '</pre>';
+            output += '</div>';
+            
+            output += '</div>';
+            
+            // Simulate DOM update and restoration
+            output += '<h3>Simulating DOM Update and Restoration:</h3>';
+            
+            // Save current states
+            const savedStates = {};
+            includeCheckboxes.forEach(cb => {
+                savedStates[cb.dataset.scenarioType] = cb.checked;
+            });
+            
+            // Scramble the DOM (simulate reorder)
+            const container = includeCheckboxes[0].parentElement.parentElement;
+            const cards = Array.from(container.children);
+            cards.reverse(); // Reverse order to simulate reordering
+            container.innerHTML = '';
+            cards.forEach(card => container.appendChild(card));
+            
+            // Now restore using type-based method
+            const newCheckboxes = document.querySelectorAll('.include-checkbox');
+            newCheckboxes.forEach(checkbox => {
+                if (checkbox.dataset.scenarioType && savedStates.hasOwnProperty(checkbox.dataset.scenarioType)) {
+                    checkbox.checked = savedStates[checkbox.dataset.scenarioType];
+                }
+            });
+            
+            output += '<div class="status success">✅ States restored successfully using type-based tracking even after DOM reordering!</div>';
+            
+            statusDiv.innerHTML = output;
+        }
+        
+        function clearTest() {
+            document.getElementById('test-status').innerHTML = '';
+            document.getElementById('test-output').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

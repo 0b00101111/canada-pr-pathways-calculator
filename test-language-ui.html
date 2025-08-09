@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improved Language UI Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f9fafb;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95em;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .form-grid {
+            display: grid;
+            gap: 15px;
+        }
+        
+        small {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.85em;
+        }
+        
+        h3 {
+            margin-bottom: 25px;
+            color: #1f2937;
+            font-size: 1.5em;
+        }
+        
+        h4 {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .language-input-section {
+            margin-top: 20px;
+        }
+        
+        .test-button {
+            margin-top: 30px;
+            padding: 12px 24px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .test-button:hover {
+            background: #4f46e5;
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Improved Language UI Demo</h1>
+    <p>This demonstrates the improved language input interface with clear IELTS/CLB mapping.</p>
+    
+    <div id="languageSection"></div>
+    
+    <button class="test-button" onclick="testCalculation()">Test Calculation</button>
+    
+    <div id="results" class="results" style="display: none;"></div>
+    
+    <script src="js/language-ui-improvements.js"></script>
+    <script>
+        // Load the improved UI
+        document.getElementById('languageSection').innerHTML = LanguageUIModule.getImprovedLanguageInputHTML();
+        
+        function testCalculation() {
+            const minCLB = LanguageUIModule.getMinimumCLB();
+            const testType = document.getElementById('english_test_type').value;
+            
+            let details = '';
+            if (testType === 'ielts') {
+                const listening = document.getElementById('clb_listening').textContent;
+                const speaking = document.getElementById('clb_speaking').textContent;
+                const reading = document.getElementById('clb_reading').textContent;
+                const writing = document.getElementById('clb_writing').textContent;
+                details = `
+                    <h4>Individual CLB Scores:</h4>
+                    <ul>
+                        <li>Listening: ${listening}</li>
+                        <li>Speaking: ${speaking}</li>
+                        <li>Reading: ${reading}</li>
+                        <li>Writing: ${writing}</li>
+                    </ul>
+                `;
+            } else if (testType === 'celpip') {
+                const listening = document.getElementById('celpip_clb_listening').textContent;
+                const speaking = document.getElementById('celpip_clb_speaking').textContent;
+                const reading = document.getElementById('celpip_clb_reading').textContent;
+                const writing = document.getElementById('celpip_clb_writing').textContent;
+                details = `
+                    <h4>Individual CLB Scores:</h4>
+                    <ul>
+                        <li>Listening: ${listening}</li>
+                        <li>Speaking: ${speaking}</li>
+                        <li>Reading: ${reading}</li>
+                        <li>Writing: ${writing}</li>
+                    </ul>
+                `;
+            }
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = `
+                <h3>Test Results</h3>
+                <p><strong>Test Type:</strong> ${testType.toUpperCase()}</p>
+                <p><strong>Minimum CLB Level:</strong> CLB ${minCLB}</p>
+                ${details}
+                <h4>Transferability Impact:</h4>
+                <ul>
+                    <li>If you have a Bachelor's degree:
+                        <ul>
+                            <li>CLB ${minCLB} → ${minCLB >= 9 ? '25' : minCLB >= 7 ? '13' : '0'} points for Education + Language</li>
+                        </ul>
+                    </li>
+                    <li>If you have 3+ years foreign work:
+                        <ul>
+                            <li>CLB ${minCLB} → ${minCLB >= 9 ? '50' : minCLB >= 7 ? '25' : '0'} points for Work + Language</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p style="margin-top: 15px; padding: 10px; background: ${minCLB >= 9 ? '#d1fae5' : '#fef3c7'}; border-radius: 6px;">
+                    <strong>Note:</strong> ${minCLB >= 9 ? 
+                        '✅ You have CLB 9+ in all abilities, qualifying for maximum transferability points!' : 
+                        '⚠️ You need CLB 9+ in ALL four abilities to get maximum transferability points.'}
+                </p>
+            `;
+        }
+    </script>
+</body>
+</html>

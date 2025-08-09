@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language UI with Timeline Integration Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        select, input[type="month"], input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        small {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .timeline-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-card {
+            border-left: 3px solid #6366f1;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f9fafb;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .timeline-card.current {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .timeline-card.planned {
+            border-left-color: #f59e0b;
+        }
+        
+        .timeline-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+        
+        .timeline-card .score {
+            font-size: 2em;
+            font-weight: bold;
+            color: #6366f1;
+            margin: 10px 0;
+        }
+        
+        .timeline-card .date {
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+        
+        .timeline-card .improvements {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .improvement-tag {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+        
+        .test-button {
+            background: #6366f1;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        
+        .test-button:hover {
+            background: #4f46e5;
+        }
+        
+        h2 {
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 30px; color: #1f2937;">
+            Language UI with Timeline Integration
+        </h1>
+        
+        <!-- Language Input Section -->
+        <div id="languageInputSection"></div>
+        
+        <!-- Test Data Input -->
+        <div class="form-section">
+            <h2>Test Profile Data</h2>
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" id="test_dob" value="1989-01-01">
+            </div>
+            <div class="form-group">
+                <label>Current Education</label>
+                <select id="test_education">
+                    <option value="bachelor" selected>Bachelor's degree</option>
+                    <option value="master">Master's degree</option>
+                    <option value="phd">PhD</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Planning Future Education?</label>
+                <input type="checkbox" id="test_future_edu" onchange="toggleFutureEdu()">
+                <div id="future_edu_section" style="display: none; margin-top: 10px;">
+                    <select id="test_future_degree">
+                        <option value="master">Master's degree</option>
+                        <option value="phd">PhD</option>
+                    </select>
+                    <input type="month" id="test_grad_date" value="2026-12" style="margin-top: 10px;">
+                    <select id="test_study_location" style="margin-top: 10px;">
+                        <option value="canada">Canada</option>
+                        <option value="home">Home Country</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Foreign Work Experience (years)</label>
+                <select id="test_foreign_work">
+                    <option value="0">None</option>
+                    <option value="1">1 year</option>
+                    <option value="2">2 years</option>
+                    <option value="3" selected>3+ years</option>
+                </select>
+            </div>
+        </div>
+        
+        <button class="test-button" onclick="generateTimeline()">Generate Timeline</button>
+        
+        <!-- Timeline Results -->
+        <div class="timeline-section" id="timelineSection" style="display: none;">
+            <h2>Your CRS Score Timeline</h2>
+            <div id="timelineResults"></div>
+        </div>
+    </div>
+    
+    <script src="js/calculator-modules.js"></script>
+    <script src="js/language-ui-enhanced.js"></script>
+    <script>
+        // Load the enhanced language UI
+        document.getElementById('languageInputSection').innerHTML = LanguageUIEnhanced.getEnhancedLanguageHTML();
+        
+        function toggleFutureEdu() {
+            const checked = document.getElementById('test_future_edu').checked;
+            document.getElementById('future_edu_section').style.display = checked ? 'block' : 'none';
+        }
+        
+        function generateTimeline() {
+            // Get language data
+            const languageData = LanguageUIEnhanced.getLanguageData();
+            
+            // Build user data object
+            const userData = {
+                dob: document.getElementById('test_dob').value,
+                married: true, // For testing
+                spouse: {
+                    education: 'bachelor',
+                    englishCLB: 7,
+                    canadianWork: 0
+                },
+                education: {
+                    current: document.getElementById('test_education').value,
+                    future: null
+                },
+                language: languageData,
+                foreignWork: parseInt(document.getElementById('test_foreign_work').value),
+                canadianWork: 0,
+                canadianEducation: 'none',
+                sibling: false,
+                pnp: false
+            };
+            
+            // Add future education if checked
+            if (document.getElementById('test_future_edu').checked) {
+                userData.education.future = {
+                    degree: document.getElementById('test_future_degree').value,
+                    graduationDate: document.getElementById('test_grad_date').value,
+                    location: document.getElementById('test_study_location').value
+                };
+            }
+            
+            // Generate scenarios
+            const scenarios = ScenarioGenerator.generateTimelineScenarios(userData);
+            
+            // Display timeline
+            displayTimeline(scenarios);
+        }
+        
+        function displayTimeline(scenarios) {
+            const timelineSection = document.getElementById('timelineSection');
+            const timelineResults = document.getElementById('timelineResults');
+            
+            timelineSection.style.display = 'block';
+            
+            let html = '';
+            scenarios.forEach(scenario => {
+                const statusClass = scenario.status === 'current' ? 'current' : 'planned';
+                const improvementTags = scenario.improvements.map(imp => 
+                    `<span class="improvement-tag">${imp}</span>`
+                ).join('');
+                
+                html += `
+                    <div class="timeline-card ${statusClass}">
+                        <h3>
+                            <span style="font-size: 1.5em;">${scenario.icon}</span>
+                            ${scenario.name}
+                        </h3>
+                        <div class="date">${scenario.timeline}</div>
+                        <div class="score">${scenario.score} points</div>
+                        ${improvementTags ? `<div class="improvements">${improvementTags}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            timelineResults.innerHTML = html;
+            
+            // Add summary
+            const currentScore = scenarios.find(s => s.status === 'current')?.score || 0;
+            const maxScore = Math.max(...scenarios.map(s => s.score));
+            const improvement = maxScore - currentScore;
+            
+            html += `
+                <div style="background: #e0e7ff; padding: 20px; border-radius: 8px; margin-top: 30px;">
+                    <h3 style="color: #4338ca; margin-bottom: 10px;">Summary</h3>
+                    <p><strong>Current Score:</strong> ${currentScore} points</p>
+                    <p><strong>Potential Maximum:</strong> ${maxScore} points</p>
+                    <p><strong>Possible Improvement:</strong> +${improvement} points</p>
+                    ${improvement > 50 ? 
+                        '<p style="margin-top: 10px; color: #059669;"><strong>✅ Significant improvement possible with your planned goals!</strong></p>' :
+                        '<p style="margin-top: 10px; color: #dc2626;"><strong>⚠️ Consider additional improvements like French language skills.</strong></p>'
+                    }
+                </div>
+            `;
+            
+            timelineResults.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

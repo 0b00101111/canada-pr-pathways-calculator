@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Integration - Enhanced Language UI</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        .status.info {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        pre {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        #calculator-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Integration Test: Enhanced Language UI</h1>
+    
+    <div class="test-section">
+        <h2>Module Loading Status</h2>
+        <div id="loading-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Calculator with Enhanced Language UI</h2>
+        <div id="calculator-container"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Data Output Test</h2>
+        <button onclick="testDataExtraction()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
+            Test Data Extraction
+        </button>
+        <div id="data-output" style="margin-top: 20px;"></div>
+    </div>
+    
+    <!-- Load all required scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/draw-data.js"></script>
+    <script src="js/calculator-modules.js"></script>
+    <script src="js/language-ui-enhanced.js"></script>
+    <script src="js/enhanced-calculator.js"></script>
+    
+    <script>
+        // Check module loading
+        window.addEventListener('DOMContentLoaded', function() {
+            const statusDiv = document.getElementById('loading-status');
+            let statusHTML = '';
+            
+            // Check each module
+            const modules = [
+                { name: 'Chart.js', check: typeof Chart !== 'undefined' },
+                { name: 'Historical Draw Data', check: typeof historicalDrawData !== 'undefined' },
+                { name: 'Calculator Modules', check: typeof EducationModule !== 'undefined' },
+                { name: 'Language UI Enhanced', check: typeof LanguageUIEnhanced !== 'undefined' },
+                { name: 'Enhanced Calculator', check: typeof getEnhancedCalculatorHTML !== 'undefined' }
+            ];
+            
+            modules.forEach(module => {
+                const status = module.check ? 'success' : 'error';
+                const icon = module.check ? '✅' : '❌';
+                statusHTML += `<div class="status ${status}">${icon} ${module.name}: ${module.check ? 'Loaded' : 'Failed'}</div>`;
+            });
+            
+            statusDiv.innerHTML = statusHTML;
+            
+            // If all modules loaded, initialize calculator
+            if (modules.every(m => m.check)) {
+                initializeTestCalculator();
+            }
+        });
+        
+        function initializeTestCalculator() {
+            try {
+                // Load calculator HTML
+                const container = document.getElementById('calculator-container');
+                const calculatorHTML = getEnhancedCalculatorHTML('studying');
+                container.innerHTML = calculatorHTML;
+                
+                // Initialize the calculator
+                initializeEnhancedCalculator('studying');
+                
+                // Add success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'status success';
+                successMsg.textContent = '✅ Calculator initialized successfully with enhanced language UI';
+                container.insertBefore(successMsg, container.firstChild);
+                
+            } catch (error) {
+                console.error('Error initializing calculator:', error);
+                const container = document.getElementById('calculator-container');
+                container.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function testDataExtraction() {
+            const outputDiv = document.getElementById('data-output');
+            
+            try {
+                // Try to get language data
+                if (window.languageUI) {
+                    const languageData = window.languageUI.getLanguageData();
+                    outputDiv.innerHTML = `
+                        <div class="status success">✅ Data extraction successful!</div>
+                        <h3>Language Data:</h3>
+                        <pre>${JSON.stringify(languageData, null, 2)}</pre>
+                    `;
+                } else {
+                    outputDiv.innerHTML = `<div class="status info">ℹ️ Language UI not initialized yet. Please interact with the language section first.</div>`;
+                }
+                
+                // Also test gathering all form data
+                const formData = gatherFormData();
+                outputDiv.innerHTML += `
+                    <h3>All Form Data:</h3>
+                    <pre>${JSON.stringify(formData, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                outputDiv.innerHTML = `<div class="status error">❌ Error extracting data: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

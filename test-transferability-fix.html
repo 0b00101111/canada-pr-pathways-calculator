@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Transferability Fix</title>
+</head>
+<body>
+    <h1>Testing CRS Transferability Fix</h1>
+    <div id="results"></div>
+    
+    <script src="js/calculator-modules.js"></script>
+    <script>
+        // Test case: Your profile
+        const testProfile = {
+            age: 36,
+            married: true,
+            education: 'bachelor',
+            englishCLB: 10,
+            frenchNCLC: 0,
+            foreignWork: 3,
+            canadianWork: 0,
+            canadianEducation: 'none',
+            sibling: false,
+            pnp: false,
+            spouse: {
+                education: 'bachelor',
+                englishCLB: 7,
+                canadianWork: 0
+            }
+        };
+        
+        // Calculate score
+        const score = ScenarioGenerator.calculateCRSForScenario(testProfile);
+        
+        // Calculate individual components
+        const agePoints = AgeModule.calculateAgePoints(36, true);
+        const eduPoints = EducationModule.calculateEducationPoints('bachelor', true);
+        const langPoints = LanguageModule.calculateLanguagePoints(10, 0, true);
+        const canadianWorkPoints = WorkExperienceModule.calculateCanadianWorkPoints(0, true);
+        const spousePoints = SpouseModule.calculateSpousePoints(testProfile.spouse);
+        const transferabilityPoints = WorkExperienceModule.calculateSkillTransferability('bachelor', 3, 10, 0);
+        
+        // Display results
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = `
+            <h2>Score Breakdown:</h2>
+            <table border="1" cellpadding="10">
+                <tr><th>Component</th><th>Points</th></tr>
+                <tr><td>Age (36, married)</td><td>${agePoints}</td></tr>
+                <tr><td>Education (Bachelor's, married)</td><td>${eduPoints}</td></tr>
+                <tr><td>Language (CLB 10, married)</td><td>${langPoints}</td></tr>
+                <tr><td>Canadian Work Experience</td><td>${canadianWorkPoints}</td></tr>
+                <tr><td>Spouse Factors</td><td>${spousePoints}</td></tr>
+                <tr><td><strong>Skill Transferability</strong></td><td><strong>${transferabilityPoints}</strong></td></tr>
+                <tr><td>Additional Factors</td><td>0</td></tr>
+                <tr style="background-color: #f0f0f0;"><td><strong>TOTAL CRS SCORE</strong></td><td><strong>${score}</strong></td></tr>
+            </table>
+            
+            <h3>Transferability Details:</h3>
+            <ul>
+                <li>Bachelor's + CLB 10: 25 points (fixed from 50)</li>
+                <li>3+ years foreign work + CLB 10: 50 points</li>
+                <li>Total transferability: 75 points (capped at 100)</li>
+            </ul>
+            
+            <h3>Verification:</h3>
+            <p style="color: ${score === 400 ? 'green' : 'red'}; font-weight: bold;">
+                ${score === 400 ? '✅ SUCCESS: Score matches official IRCC calculator (400 points)' : 
+                  '❌ ERROR: Score does not match (expected 400, got ' + score + ')'}
+            </p>
+        `;
+    </script>
+</body>
+</html>

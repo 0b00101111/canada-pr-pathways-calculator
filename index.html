@@ -826,6 +826,21 @@
             color: #2c5282;
         }
         
+        .scenario-status.achieved {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        
+        .scenario-card.achieved {
+            opacity: 0.85;
+            background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+        }
+        
+        .scenario-card.achieved::before {
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+            height: 6px;
+        }
+        
         .scenario-score {
             font-size: 2.5em;
             font-weight: bold;
@@ -1663,6 +1678,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/draw-data.js"></script>
     <script src="js/calculator-modules.js"></script>
+    <script src="js/language-ui-enhanced.js"></script>
     <script src="js/enhanced-calculator.js"></script>
     
     <script>

@@ -132,157 +132,8 @@ function getEnhancedCalculatorHTML(journey) {
                     
                     <div class="form-section">
                         <h3>🗣️ Language Skills</h3>
-                        
-                        <div style="margin-bottom: 30px;">
-                            <h4 style="color: #4a5568; margin-bottom: 15px;">English Proficiency</h4>
-                            <div class="status-radio-group">
-                                <label class="status-radio">
-                                    <input type="radio" name="englishStatus" value="completed" checked>
-                                    Completed test
-                                </label>
-                                <label class="status-radio">
-                                    <input type="radio" name="englishStatus" value="booked">
-                                    Test booked
-                                </label>
-                                <label class="status-radio">
-                                    <input type="radio" name="englishStatus" value="preparing">
-                                    Preparing
-                                </label>
-                                <label class="status-radio">
-                                    <input type="radio" name="englishStatus" value="none">
-                                    Not planning
-                                </label>
-                            </div>
-                            
-                            <div id="englishCompleted" class="language-option">
-                                <div class="form-group">
-                                    <label>Current English Level (CLB)</label>
-                                    <select id="calc_english_clb">
-                                        <option value="0">No test / Below CLB 4</option>
-                                        <option value="4">CLB 4</option>
-                                        <option value="5">CLB 5</option>
-                                        <option value="6">CLB 6</option>
-                                        <option value="7" selected>CLB 7 (IELTS 6.0 all)</option>
-                                        <option value="8">CLB 8</option>
-                                        <option value="9">CLB 9 (IELTS 7+)</option>
-                                        <option value="10">CLB 10</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div id="englishBooked" class="language-option" style="display: none;">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label>Target CLB Score</label>
-                                        <select id="calc_english_target">
-                                            <option value="7">CLB 7</option>
-                                            <option value="8">CLB 8</option>
-                                            <option value="9" selected>CLB 9</option>
-                                            <option value="10">CLB 10</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Test Date</label>
-                                        <input type="date" id="calc_english_test_date">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div id="englishPreparing" class="language-option" style="display: none;">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label>Current Estimated CLB</label>
-                                        <select id="calc_english_current">
-                                            <option value="5">CLB 5</option>
-                                            <option value="6">CLB 6</option>
-                                            <option value="7" selected>CLB 7</option>
-                                            <option value="8">CLB 8</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Target CLB</label>
-                                        <select id="calc_english_prep_target">
-                                            <option value="7">CLB 7</option>
-                                            <option value="8">CLB 8</option>
-                                            <option value="9" selected>CLB 9</option>
-                                            <option value="10">CLB 10</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Target Date</label>
-                                        <input type="month" id="calc_english_target_date">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h4 style="color: #4a5568; margin-bottom: 15px;">French Proficiency</h4>
-                            <div class="status-radio-group">
-                                <label class="status-radio">
-                                    <input type="radio" name="frenchStatus" value="completed">
-                                    Have test results
-                                </label>
-                                <label class="status-radio">
-                                    <input type="radio" name="frenchStatus" value="learning">
-                                    Currently learning
-                                </label>
-                                <label class="status-radio">
-                                    <input type="radio" name="frenchStatus" value="planning">
-                                    Planning to learn
-                                </label>
-                                <label class="status-radio">
-                                    <input type="radio" name="frenchStatus" value="none" checked>
-                                    No plans
-                                </label>
-                            </div>
-                            
-                            <div id="frenchCompleted" class="language-option" style="display: none;">
-                                <div class="form-group">
-                                    <label>French Level (NCLC)</label>
-                                    <select id="calc_french_nclc">
-                                        <option value="0">No French</option>
-                                        <option value="4">NCLC 4</option>
-                                        <option value="5">NCLC 5</option>
-                                        <option value="6">NCLC 6</option>
-                                        <option value="7">NCLC 7 (TEF B2)</option>
-                                        <option value="8">NCLC 8</option>
-                                        <option value="9">NCLC 9+</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div id="frenchLearning" class="language-option" style="display: none;">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label>Current Level</label>
-                                        <select id="calc_french_current">
-                                            <option value="0">Beginner (A0-A1)</option>
-                                            <option value="3">Elementary (A2)</option>
-                                            <option value="4">Intermediate (B1)</option>
-                                            <option value="5">Upper-Int (B1+)</option>
-                                            <option value="6">Advanced (B2-)</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Target NCLC 7 by</label>
-                                        <input type="month" id="calc_french_target_date">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div id="frenchPlanning" class="language-option" style="display: none;">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label>Start Learning</label>
-                                        <input type="month" id="calc_french_start">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Estimated NCLC 7 (12-18 months)</label>
-                                        <input type="month" id="calc_french_estimated" readonly>
-                                    </div>
-                                </div>
-                            </div>
+                        <div id="language-input-container">
+                            <!-- Enhanced language UI will be injected here -->
                         </div>
                     </div>
                     
@@ -362,6 +213,16 @@ function getEnhancedCalculatorHTML(journey) {
 
 // Initialize enhanced calculator
 function initializeEnhancedCalculator(journey) {
+    // Initialize the enhanced language UI
+    const languageContainer = document.getElementById('language-input-container');
+    if (languageContainer && typeof LanguageUIEnhanced !== 'undefined') {
+        const languageUI = new LanguageUIEnhanced();
+        languageContainer.innerHTML = languageUI.getHTML();
+        languageUI.initialize();
+        // Store reference globally for data access
+        window.languageUI = languageUI;
+    }
+    
     // Set up event listeners
     const maritalSelect = document.getElementById('calc_marital');
     if (maritalSelect) {
@@ -395,55 +256,6 @@ function initializeEnhancedCalculator(journey) {
         });
     }
     
-    // English status radio buttons
-    document.querySelectorAll('input[name="englishStatus"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            document.querySelectorAll('#englishCompleted, #englishBooked, #englishPreparing').forEach(div => {
-                div.style.display = 'none';
-            });
-            
-            if (this.value === 'completed') {
-                document.getElementById('englishCompleted').style.display = 'block';
-            } else if (this.value === 'booked') {
-                document.getElementById('englishBooked').style.display = 'block';
-            } else if (this.value === 'preparing') {
-                document.getElementById('englishPreparing').style.display = 'block';
-            }
-        });
-    });
-    
-    // French status radio buttons
-    document.querySelectorAll('input[name="frenchStatus"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            document.querySelectorAll('#frenchCompleted, #frenchLearning, #frenchPlanning').forEach(div => {
-                div.style.display = 'none';
-            });
-            
-            if (this.value === 'completed') {
-                document.getElementById('frenchCompleted').style.display = 'block';
-            } else if (this.value === 'learning') {
-                document.getElementById('frenchLearning').style.display = 'block';
-            } else if (this.value === 'planning') {
-                document.getElementById('frenchPlanning').style.display = 'block';
-            }
-        });
-    });
-    
-    // Auto-calculate French learning timeline
-    const frenchStartInput = document.getElementById('calc_french_start');
-    if (frenchStartInput) {
-        frenchStartInput.addEventListener('change', function() {
-            if (this.value) {
-                const startDate = new Date(this.value);
-                startDate.setMonth(startDate.getMonth() + 15); // Default 15 months
-                const estimatedInput = document.getElementById('calc_french_estimated');
-                if (estimatedInput) {
-                    estimatedInput.value = startDate.toISOString().substring(0, 7);
-                }
-            }
-        });
-    }
-    
     // Set date constraints
     const today = new Date();
     const maxDOB = new Date();
@@ -463,23 +275,25 @@ function prefillByJourney(journey) {
     if (journey === 'studying') {
         document.getElementById('calc_completed_edu').value = 'bachelor';
         document.getElementById('calc_canadian_edu').value = '3year';
-        document.getElementById('calc_english_clb').value = '7';
+        // Language will be pre-filled by the enhanced UI
         document.getElementById('calc_studying').checked = true;
         document.getElementById('studyingDetails').classList.add('active');
         document.getElementById('calc_study_location').value = 'canada';
     } else if (journey === 'working') {
         document.getElementById('calc_canadian_work').value = '1';
-        document.getElementById('calc_english_clb').value = '8';
+        // Language will be pre-filled by the enhanced UI
         document.getElementById('calc_completed_edu').value = 'bachelor';
     } else if (journey === 'dreaming') {
         document.getElementById('calc_foreign_work').value = '3';
-        document.getElementById('calc_english_clb').value = '7';
+        // Language will be pre-filled by the enhanced UI
         document.getElementById('calc_completed_edu').value = 'master';
     }
 }
 
-// Store user data globally for charts
+// Store user data globally for charts and recalculation
 let currentScenarios = [];
+let currentUserData = null;
+let currentRecommendations = [];
 
 // Main calculation function
 function calculateEnhancedCRS() {
@@ -494,13 +308,38 @@ function calculateEnhancedCRS() {
         } : null
     };
 
+    // Build language data structure for timeline scenarios
     const languageData = {
-        english: { current: parseInt(formData.englishCLB) || 0, target: 0, targetDate: null },
-        french: { current: parseInt(formData.frenchNCLC) || 0, target: 0, targetDate: null }
+        english: { 
+            current: parseInt(formData.englishCLB) || 0, 
+            target: 0, 
+            targetDate: null 
+        },
+        french: { 
+            current: parseInt(formData.frenchNCLC) || 0, 
+            target: 0, 
+            targetDate: null 
+        }
     };
-    if (document.querySelector('input[name="frenchStatus"]:checked')?.value !== 'none' && document.querySelector('input[name="frenchStatus"]:checked')?.value !== 'completed') {
-        languageData.french.target = 7;
-        languageData.french.targetDate = formData.frenchTargetDate || formData.frenchEstimatedDate;
+    
+    // Handle English planned tests
+    if (formData.englishStatus === 'planned' && formData.languageData?.english) {
+        // For planned tests, current is 0 (or lower estimate), target is the planned score
+        languageData.english.current = 0; // They haven't taken the test yet
+        languageData.english.target = formData.languageData.english.score || 7; // Their planned CLB level
+        languageData.english.targetDate = formData.languageData.english.targetDate;
+    } else if (formData.englishStatus === 'completed') {
+        // For completed tests, use the score as current
+        languageData.english.current = parseInt(formData.englishCLB) || 0;
+    }
+    
+    // Handle French planned tests
+    if (formData.frenchStatus === 'planned' && formData.languageData?.french) {
+        languageData.french.current = 0; // They haven't taken the test yet
+        languageData.french.target = formData.languageData.french.score || 7;
+        languageData.french.targetDate = formData.languageData.french.targetDate;
+    } else if (formData.frenchStatus === 'completed') {
+        languageData.french.current = parseInt(formData.frenchNCLC) || 0;
     }
     
     const userData = {
@@ -520,15 +359,30 @@ function calculateEnhancedCRS() {
         } : null
     };
     
-    currentScenarios = ScenarioGenerator.generateTimelineScenarios(userData);
-    const recommendations = RecommendationsModule.generateRecommendations(currentScenarios, userData);
+    // Store data for recalculation
+    currentUserData = userData;
     
-    displayEnhancedResults(currentScenarios, recommendations);
+    currentScenarios = ScenarioGenerator.generateTimelineScenarios(userData);
+    currentRecommendations = RecommendationsModule.generateRecommendations(currentScenarios, userData);
+    
+    displayEnhancedResults(currentScenarios, currentRecommendations);
 }
 
 
 // Gather form data
 function gatherFormData() {
+    // Get language data from enhanced UI if available
+    let languageData = null;
+    if (typeof LanguageUIEnhanced !== 'undefined' && window.languageUI) {
+        languageData = window.languageUI.getLanguageData();
+    }
+    
+    // Fallback to basic form elements if enhanced UI not available
+    const englishCLB = languageData?.english?.score || 
+                       document.getElementById('calc_english_clb')?.value || 0;
+    const frenchNCLC = languageData?.french?.score || 
+                       document.getElementById('calc_french_nclc')?.value || 0;
+    
     return {
         dob: document.getElementById('calc_dob')?.value,
         married: document.getElementById('calc_marital')?.value === 'married',
@@ -538,11 +392,13 @@ function gatherFormData() {
         studyingDegree: document.getElementById('calc_studying_degree')?.value,
         graduationDate: document.getElementById('calc_graduation_date')?.value,
         studyLocation: document.getElementById('calc_study_location')?.value,
-        englishCLB: document.getElementById('calc_english_clb')?.value,
-        frenchStatus: document.querySelector('input[name="frenchStatus"]:checked')?.value,
-        frenchNCLC: document.getElementById('calc_french_nclc')?.value,
-        frenchTargetDate: document.getElementById('calc_french_target_date')?.value,
-        frenchEstimatedDate: document.getElementById('calc_french_estimated')?.value,
+        englishCLB: englishCLB,
+        englishStatus: languageData?.english?.status || 'none',
+        englishTargetDate: languageData?.english?.targetDate || null,
+        frenchNCLC: frenchNCLC,
+        frenchStatus: languageData?.french?.status || 'none',
+        frenchTargetDate: languageData?.french?.targetDate || null,
+        languageData: languageData,  // Store full language data for timeline calculation
         foreignWork: parseInt(document.getElementById('calc_foreign_work')?.value || 0),
         canadianWork: parseInt(document.getElementById('calc_canadian_work')?.value || 0),
         sibling: document.getElementById('calc_sibling')?.checked,
@@ -565,18 +421,22 @@ function displayEnhancedResults(scenarios, recommendations) {
         
         <div class="scenario-cards">
             ${scenarios.map((scenario, index) => {
-                const scoreColor = scenario.score >= 500 ? '#48bb78' : 
+                const isExcluded = scenario.excluded || false;
+                const scoreColor = isExcluded ? '#9ca3af' : 
+                                  scenario.score >= 500 ? '#48bb78' : 
                                   scenario.score >= 470 ? '#ed8936' : 
                                   scenario.score >= 440 ? '#f6ad55' : '#e53e3e';
+                const cardOpacity = isExcluded ? 'opacity: 0.6;' : '';
                 
                 return `
-                    <div class="scenario-card ${scenario.status}">
+                    <div class="scenario-card ${scenario.status}" style="${cardOpacity}">
                         <div class="scenario-header">
                             <div class="scenario-status ${scenario.status}">
                                 ${scenario.status.charAt(0).toUpperCase() + scenario.status.slice(1)}
                             </div>
+                            ${isExcluded ? '<span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 8px;">Excluded</span>' : ''}
                         </div>
-                        <h4 style="color: #2d3748; margin: 10px 0;">
+                        <h4 style="color: ${isExcluded ? '#9ca3af' : '#2d3748'}; margin: 10px 0;">
                             ${scenario.icon} ${scenario.name}
                         </h4>
                         <div class="scenario-score" style="color: ${scoreColor};">
@@ -586,9 +446,19 @@ function displayEnhancedResults(scenarios, recommendations) {
                             📅 ${scenario.timeline}
                         </div>
                         ${scenario.status !== 'current' ? `
-                        <div class="checkbox-group" style="margin-top: 10px; padding: 8px; font-size: 0.85em;">
-                            <input type="checkbox" id="compare-scenario-${index}" onchange="updateChartScenarios()" data-score="${scenario.score}" data-label="${scenario.name.replace(/"/g, '&quot;')}" data-is-french="${scenario.improvements.includes('French proficiency')}" style="width: 16px; height: 16px;">
-                            <label for="compare-scenario-${index}" style="margin: 0; font-size: 0.9em;">Compare on Chart</label>
+                        <div class="scenario-actions" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="include-${index}" 
+                                       class="include-checkbox" 
+                                       ${!isExcluded ? 'checked' : ''}
+                                       onchange="recalculateWithSelection()" 
+                                       data-scenario-type="${scenario.type}"
+                                       data-scenario-name="${scenario.name}"
+                                       style="width: 16px; height: 16px; margin-right: 6px;">
+                                <label for="include-${index}" style="margin: 0; font-size: 0.9em; color: ${isExcluded ? '#9ca3af' : '#48bb78'}; font-weight: 500;">
+                                    ${isExcluded ? '☐' : '✓'} Include in calculation
+                                </label>
+                            </div>
                         </div>
                         ` : ''}
                     </div>
@@ -622,7 +492,24 @@ function displayEnhancedResults(scenarios, recommendations) {
     
     resultsDiv.innerHTML = html;
     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    updateChartScenarios();
+    
+    // Restore achieved status from localStorage
+    scenarios.forEach((scenario, index) => {
+        if (scenario.status !== 'current') {
+            const scenarioId = `${scenario.name}-${scenario.timeline}`;
+            const isAchieved = localStorage.getItem(`achieved-${scenarioId}`) === 'true';
+            if (isAchieved) {
+                const checkbox = document.getElementById(`achieved-${index}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    updateAchievedStatus(index, true);
+                }
+            }
+        }
+    });
+    
+    // Initial chart should show all draws and all scenario lines
+    renderInitialChart(scenarios, recommendations);
 }
 
 function updateChartScenarios() {
@@ -888,6 +775,178 @@ function renderCRSChart(scenariosToCompare, hasPNP, pathwayType) {
     });
 }
 
+// Mark scenario as achieved
+function markAsAchieved(index, scenarioId) {
+    const checkbox = document.getElementById(`achieved-${index}`);
+    const isChecked = checkbox?.checked || false;
+    
+    // Save to localStorage
+    localStorage.setItem(`achieved-${scenarioId}`, isChecked);
+    
+    // Update visual status
+    updateAchievedStatus(index, isChecked);
+}
+
+function updateAchievedStatus(index, isAchieved) {
+    const card = document.querySelector(`.scenario-cards .scenario-card:nth-child(${index + 1})`);
+    const statusBadge = card?.querySelector('.scenario-status');
+    
+    if (card && statusBadge) {
+        if (isAchieved) {
+            card.classList.add('achieved');
+            statusBadge.textContent = 'Achieved';
+            statusBadge.className = 'scenario-status achieved';
+        } else {
+            card.classList.remove('achieved');
+            const originalStatus = currentScenarios[index]?.status || 'planned';
+            statusBadge.textContent = originalStatus.charAt(0).toUpperCase() + originalStatus.slice(1);
+            statusBadge.className = `scenario-status ${originalStatus}`;
+        }
+    }
+}
+
+// Recalculate scenarios based on selected improvements
+function recalculateWithSelection() {
+    if (!currentUserData) return;
+    
+    // Get which improvements are included
+    const includeCheckboxes = document.querySelectorAll('.include-checkbox');
+    const includedTypes = [];
+    const excludedTypes = [];
+    
+    includeCheckboxes.forEach(checkbox => {
+        if (checkbox.dataset.scenarioType) {
+            if (checkbox.checked) {
+                includedTypes.push(checkbox.dataset.scenarioType);
+            } else {
+                excludedTypes.push(checkbox.dataset.scenarioType);
+            }
+        }
+    });
+    
+    // Create modified user data excluding unchecked improvements
+    const modifiedUserData = JSON.parse(JSON.stringify(currentUserData));
+    
+    if (excludedTypes.includes('english')) {
+        modifiedUserData.language.english.target = 0;
+        modifiedUserData.language.english.targetDate = null;
+    }
+    
+    if (excludedTypes.includes('french')) {
+        modifiedUserData.language.french.target = 0;
+        modifiedUserData.language.french.targetDate = null;
+    }
+    
+    if (excludedTypes.includes('education')) {
+        modifiedUserData.education.future = null;
+    }
+    
+    // Regenerate scenarios with modified data for score calculation
+    const recalculatedScenarios = ScenarioGenerator.generateTimelineScenarios(modifiedUserData);
+    
+    // But display ALL original scenarios, just update their scores and mark excluded ones
+    const allScenarios = ScenarioGenerator.generateTimelineScenarios(currentUserData);
+    
+    // Update scores for included scenarios
+    allScenarios.forEach(scenario => {
+        if (scenario.type && excludedTypes.includes(scenario.type)) {
+            // Mark as excluded but keep the card
+            scenario.excluded = true;
+            // Find the matching recalculated scenario to get the updated score
+            const matchingRecalc = recalculatedScenarios.find(s => 
+                s.name === scenario.name || 
+                (s.timeline === scenario.timeline && s.status === scenario.status)
+            );
+            if (matchingRecalc) {
+                scenario.score = matchingRecalc.score;
+            }
+        } else {
+            scenario.excluded = false;
+            // Update score from recalculated scenarios
+            const matchingRecalc = recalculatedScenarios.find(s => 
+                s.name === scenario.name || 
+                (s.timeline === scenario.timeline && s.status === scenario.status)
+            );
+            if (matchingRecalc) {
+                scenario.score = matchingRecalc.score;
+            }
+        }
+    });
+    
+    const newRecommendations = RecommendationsModule.generateRecommendations(recalculatedScenarios, modifiedUserData);
+    
+    // Store checkbox states by scenario type
+    const checkboxStatesByType = {};
+    includeCheckboxes.forEach(checkbox => {
+        if (checkbox.dataset.scenarioType) {
+            checkboxStatesByType[checkbox.dataset.scenarioType] = checkbox.checked;
+        }
+    });
+    
+    // Update display with all scenarios (including excluded ones)
+    displayEnhancedResults(allScenarios, newRecommendations);
+    
+    // Restore checkbox states by matching scenario type
+    const newCheckboxes = document.querySelectorAll('.include-checkbox');
+    newCheckboxes.forEach(checkbox => {
+        if (checkbox.dataset.scenarioType && checkboxStatesByType.hasOwnProperty(checkbox.dataset.scenarioType)) {
+            checkbox.checked = checkboxStatesByType[checkbox.dataset.scenarioType];
+        }
+    });
+    
+    // Update chart based on French qualification
+    updateChartAutomatically(includedTypes, recalculatedScenarios);
+}
+
+// Render initial chart with all draws and all score lines
+function renderInitialChart(scenarios, recommendations) {
+    const pnpSelected = document.getElementById('calc_pnp')?.checked || false;
+    
+    // Check if user has French language scenario
+    const hasFrenchScenario = scenarios.some(s => s.type === 'french');
+    
+    // For initial render, show all draws (including French) if user has any French scenario
+    // Otherwise show standard draws only
+    let pathwayType = hasFrenchScenario ? 'all' : 'standard';
+    
+    // Create all scenario lines for the chart
+    const scenariosToCompare = scenarios.map(s => ({
+        value: s.score,
+        label: s.name,
+        color: s.status === 'current' ? '#48bb78' : '#4299e1',
+        position: s.status === 'current' ? 'start' : 'end'
+    }));
+    
+    renderCRSChart(scenariosToCompare, pnpSelected, pathwayType);
+}
+
+// Automatically update chart based on scenario selection
+function updateChartAutomatically(includedTypes, scenarios) {
+    const pnpSelected = document.getElementById('calc_pnp')?.checked || false;
+    const hasFrench = includedTypes.includes('french');
+    
+    // Determine pathway type for chart
+    let pathwayType;
+    if (hasFrench) {
+        // If French is included, show ALL draws (both French AND general)
+        // because having French makes you eligible for both types of draws
+        pathwayType = 'all';
+    } else {
+        // If French is excluded, only show standard draws (no French draws)
+        pathwayType = 'standard';
+    }
+    
+    // Create scenarios to compare
+    const scenariosToCompare = scenarios.map(s => ({
+        value: s.score,
+        label: s.name,
+        color: s.status === 'current' ? '#48bb78' : '#4299e1',
+        position: s.status === 'current' ? 'start' : 'end'
+    }));
+    
+    renderCRSChart(scenariosToCompare, pnpSelected, pathwayType);
+}
+
 // Make functions globally available
 if (typeof window !== 'undefined') {
     window.getEnhancedCalculatorHTML = getEnhancedCalculatorHTML;
@@ -896,4 +955,6 @@ if (typeof window !== 'undefined') {
     window.updateChartScenarios = updateChartScenarios;
     window.exportResults = exportResults;
     window.resetCalculator = resetCalculator;
+    window.markAsAchieved = markAsAchieved;
+    window.recalculateWithSelection = recalculateWithSelection;
 }

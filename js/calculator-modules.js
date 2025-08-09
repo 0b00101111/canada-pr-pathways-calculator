@@ -168,50 +168,135 @@ const ScenarioGenerator = {
             pnp: userData.pnp
         };
         
+        // Current status
         scenarios.push({
             name: 'Current Status',
             date: today,
             score: this.calculateCRSForScenario({ ...baseData, age: AgeModule.calculateAge(baseData.dob) }),
-            timeline: 'Today', status: 'current', icon: '📍', improvements: []
+            timeline: 'Today', status: 'current', icon: '📍', improvements: [],
+            type: null // Current score has no improvement type
         });
 
+        // Check for future English test
+        const hasFutureEnglish = userData.language.english.targetDate && 
+                                userData.language.english.target > userData.language.english.current;
+        
+        // Check for future French test (moved up to use in graduation scenario)
+        const hasFutureFrench = userData.language.french.targetDate && 
+                               userData.language.french.target > userData.language.french.current;
+        
+        // Check for future education
         const hasFutureEducation = userData.education.future;
-        const hasFutureFrench = userData.language.french.targetDate && userData.language.french.target > baseData.frenchNCLC;
 
-        if (hasFutureEducation) {
-            const gradDate = userData.education.future.graduationDate;
-            const gradAge = AgeModule.getAgeOnDate(baseData.dob, gradDate);
-            scenarios.push({
-                name: 'After Graduation', date: new Date(gradDate),
-                score: this.calculateCRSForScenario({ ...baseData, age: gradAge, education: userData.education.future.degree, canadianEducation: '3year' }),
-                timeline: this.formatDate(gradDate), status: 'in-progress', icon: '🎓', improvements: ['Higher education']
-            });
-            latestDate = new Date(Math.max(latestDate, new Date(gradDate)));
-        }
-
+        // Create an array of all future events with dates for proper chronological ordering
+        const futureEvents = [];
+        
         if (hasFutureFrench) {
-            const frenchDate = userData.language.french.targetDate;
-            const frenchAge = AgeModule.getAgeOnDate(baseData.dob, frenchDate);
-            scenarios.push({
-                name: 'With French NCLC 7', date: new Date(frenchDate),
-                score: this.calculateCRSForScenario({ ...baseData, age: frenchAge, frenchNCLC: userData.language.french.target }),
-                timeline: this.formatDate(frenchDate), status: 'planned', icon: '🇫🇷', improvements: ['French proficiency']
-            });
-            latestDate = new Date(Math.max(latestDate, new Date(frenchDate)));
-        }
-
-        if (hasFutureEducation && hasFutureFrench) {
-            const gradDate = new Date(userData.education.future.graduationDate);
-            const frenchDate = new Date(userData.language.french.targetDate);
-            const bestCaseDate = new Date(Math.max(gradDate, frenchDate));
-            const bestCaseAge = AgeModule.getAgeOnDate(baseData.dob, bestCaseDate);
-            scenarios.push({
-                name: 'Graduation + French', date: bestCaseDate,
-                score: this.calculateCRSForScenario({ ...baseData, age: bestCaseAge, education: userData.education.future.degree, frenchNCLC: userData.language.french.target, canadianEducation: '3year' }),
-                timeline: this.formatDate(bestCaseDate.toISOString().slice(0,10)), status: 'planned', icon: '🚀', improvements: ['French proficiency', 'Higher education']
+            const frenchDateStr = userData.language.french.targetDate.includes('-') && userData.language.french.targetDate.split('-').length === 3 
+                ? userData.language.french.targetDate 
+                : userData.language.french.targetDate + '-15';
+            futureEvents.push({
+                type: 'french',
+                date: new Date(frenchDateStr),
+                dateStr: frenchDateStr,
+                target: userData.language.french.target
             });
         }
         
+        if (hasFutureEnglish) {
+            const englishDateStr = userData.language.english.targetDate.includes('-') && userData.language.english.targetDate.split('-').length === 3 
+                ? userData.language.english.targetDate 
+                : userData.language.english.targetDate + '-15';
+            futureEvents.push({
+                type: 'english',
+                date: new Date(englishDateStr),
+                dateStr: englishDateStr,
+                target: userData.language.english.target
+            });
+        }
+        
+        if (hasFutureEducation) {
+            const gradDateStr = userData.education.future.graduationDate + '-15';
+            futureEvents.push({
+                type: 'education',
+                date: new Date(gradDateStr),
+                dateStr: gradDateStr,
+                degree: userData.education.future.degree,
+                location: userData.education.future.location
+            });
+        }
+        
+        // Sort events chronologically
+        futureEvents.sort((a, b) => a.date - b.date);
+        
+        // Track cumulative state
+        let cumulativeData = { ...baseData };
+        
+        // Process each event in chronological order
+        for (const event of futureEvents) {
+            const eventAge = AgeModule.getAgeOnDate(baseData.dob, event.date);
+            const improvements = [];
+            
+            if (event.type === 'french') {
+                cumulativeData.frenchNCLC = event.target;
+                improvements.push('French proficiency');
+                
+                scenarios.push({
+                    name: `French NCLC ${event.target} Achieved`,
+                    date: event.date,
+                    score: this.calculateCRSForScenario({ 
+                        ...cumulativeData, 
+                        age: eventAge
+                    }),
+                    timeline: this.formatDate(event.dateStr),
+                    status: 'planned',
+                    icon: '🇫🇷',
+                    improvements: improvements,
+                    type: 'french'
+                });
+            } else if (event.type === 'english') {
+                cumulativeData.englishCLB = event.target;
+                improvements.push('English proficiency');
+                
+                scenarios.push({
+                    name: `English CLB ${event.target} Achieved`,
+                    date: event.date,
+                    score: this.calculateCRSForScenario({ 
+                        ...cumulativeData, 
+                        age: eventAge
+                    }),
+                    timeline: this.formatDate(event.dateStr),
+                    status: 'planned',
+                    icon: '🎯',
+                    improvements: improvements,
+                    type: 'english'
+                });
+            } else if (event.type === 'education') {
+                cumulativeData.education = event.degree;
+                if (event.location === 'canada') {
+                    cumulativeData.canadianEducation = '3year';
+                }
+                improvements.push('Higher education');
+                
+                scenarios.push({
+                    name: 'After Graduation',
+                    date: event.date,
+                    score: this.calculateCRSForScenario({ 
+                        ...cumulativeData, 
+                        age: eventAge
+                    }),
+                    timeline: this.formatDate(event.dateStr),
+                    status: 'in-progress',
+                    icon: '🎓',
+                    improvements: improvements,
+                    type: 'education'
+                });
+            }
+            
+            latestDate = new Date(Math.max(latestDate, event.date));
+        }
+
+        // Sort scenarios by date and return
         return scenarios.sort((a, b) => a.date - b.date);
     },
     
