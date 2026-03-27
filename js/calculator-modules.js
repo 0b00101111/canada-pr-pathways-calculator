@@ -401,7 +401,7 @@ const RecommendationsModule = {
         if (currentScore > 490) {
             recommendations.push({
                 type: 'success', title: 'Excellent Score!',
-                message: 'Your score is highly competitive for general Express Entry draws. You are in a strong position.',
+                message: 'Your score is highly competitive for CEC and category-based Express Entry draws. You are in a strong position.',
                 priority: 1
             });
         }

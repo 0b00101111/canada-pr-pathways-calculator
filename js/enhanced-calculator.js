@@ -694,9 +694,10 @@ function exportResults() {
     exportText += '   - Once you have language tests and ECA\n';
     exportText += '   - Profile valid for 12 months\n\n';
     exportText += '4. Monitor Draw Scores:\n';
-    exportText += '   - General draws: Usually 480-530\n';
-    exportText += '   - French draws: Usually 350-430\n';
-    exportText += '   - CEC draws: Usually 500-550\n\n';
+    exportText += '   - CEC draws: Usually 507-534\n';
+    exportText += '   - French draws: Usually 393-446\n';
+    exportText += '   - Healthcare draws: Usually 462-476\n';
+    exportText += '   - Note: General draws paused since April 2024\n\n';
     
     exportText += '='.repeat(55) + '\n\n';
     
@@ -806,7 +807,7 @@ function renderCRSChart(scenariosToCompare, hasPNP, pathwayType) {
 
     const labels = dataToDisplay.map(d => d.date);
     const data = dataToDisplay.map(d => d.crsScore);
-    const drawTypeColors = {'General': 'rgba(113, 128, 150, 0.8)', 'PNP': 'rgba(72, 187, 120, 0.8)', 'French Language': 'rgba(229, 62, 62, 0.8)', 'CEC': 'rgba(237, 137, 54, 0.8)'};
+    const drawTypeColors = {'General': 'rgba(113, 128, 150, 0.8)', 'PNP': 'rgba(72, 187, 120, 0.8)', 'French Language': 'rgba(229, 62, 62, 0.8)', 'CEC': 'rgba(237, 137, 54, 0.8)', 'Healthcare': 'rgba(56, 178, 172, 0.8)', 'Trade': 'rgba(128, 90, 213, 0.8)', 'Education': 'rgba(49, 130, 206, 0.8)', 'Physicians': 'rgba(214, 69, 148, 0.8)', 'Senior Managers': 'rgba(159, 122, 34, 0.8)'};
     const colors = dataToDisplay.map(d => drawTypeColors[d.drawType]);
     const allScores = [...data, ...scenariosToCompare.map(s => s.value)];
     const maxDataValue = Math.max(...allScores.filter(s => s > 0));
@@ -837,7 +838,7 @@ function renderCRSChart(scenariosToCompare, hasPNP, pathwayType) {
                 legend: { display: false }
             },
             scales: {
-                y: { beginAtZero: false, min: 350, max: yAxisMax },
+                y: { beginAtZero: false, min: Math.min(150, ...data) - 10, max: yAxisMax },
                 x: { title: { display: true, text: 'Draw Date' } }
             }
         }
