@@ -535,9 +535,14 @@ function displayEnhancedResults(scenarios, recommendations) {
             }).join('')}
         </div>
 
-        <div style="margin-top: 40px; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+        <div class="chart-card" style="margin-top: 40px; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
             <h3 style="text-align: center; color: #2d3748; margin-bottom: 20px;">Your Score vs. Past Express Entry Draws</h3>
-            <canvas id="crsChart"></canvas>
+            <div class="chart-scroll-container" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <div class="chart-inner" style="min-width: 800px; position: relative;">
+                    <canvas id="crsChart"></canvas>
+                </div>
+            </div>
+            <p class="chart-scroll-hint" style="display: none; text-align: center; color: #a0aec0; font-size: 0.85em; margin-top: 10px;">← Scroll to see all draws →</p>
         </div>
         
         <div style="margin-top: 30px;">
@@ -549,11 +554,11 @@ function displayEnhancedResults(scenarios, recommendations) {
             `).join('')}
         </div>
         
-        <div style="text-align: center; margin-top: 30px;">
-            <button onclick="exportResults()" style="padding: 14px 30px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; margin: 0 10px;">
+        <div class="results-actions" style="text-align: center; margin-top: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;">
+            <button onclick="exportResults()" style="padding: 14px 30px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">
                 📥 Export Results
             </button>
-            <button onclick="resetCalculator()" style="padding: 14px 30px; background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; margin: 0 10px;">
+            <button onclick="resetCalculator()" style="padding: 14px 30px; background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">
                 🔄 Start Over
             </button>
         </div>
