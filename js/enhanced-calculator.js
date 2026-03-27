@@ -10,13 +10,13 @@ function getEnhancedCalculatorHTML(journey) {
     };
     
     return `
-        <div style="background: white; border-radius: 20px; overflow: hidden;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;">
-                <h3 style="font-size: 1.8em; margin-bottom: 10px;">${journeyTitles[journey] || 'Calculate Your CRS Score'}</h3>
-                <p style="opacity: 0.95;">Track your progress and see how your score improves over time</p>
+        <div style="background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e9ecef;">
+            <div style="background: #1a1a1a; color: white; padding: 1.5rem; text-align: center;">
+                <h3 style="font-size: 1.25em; margin-bottom: 6px; font-weight: 600;">${journeyTitles[journey] || 'Calculate Your CRS Score'}</h3>
+                <p style="opacity: 0.6; font-size: 0.9em;">Track your progress and see how your score improves over time</p>
             </div>
-            
-            <div style="padding: 40px;">
+
+            <div style="padding: 2rem;">
                 <form id="enhancedCalcForm">
                     <div class="form-section">
                         <h3>👤 Personal Information</h3>
@@ -34,8 +34,8 @@ function getEnhancedCalculatorHTML(journey) {
                             </div>
                         </div>
                         
-                        <div id="spouseSection" style="display: none; margin-top: 20px; padding: 20px; background: white; border-radius: 12px;">
-                            <h4 style="color: #667eea; margin-bottom: 15px;">Spouse Information</h4>
+                        <div id="spouseSection" style="display: none; margin-top: 1rem; padding: 1rem; background: white; border-radius: 6px; border: 1px solid #e9ecef;">
+                            <h4 style="color: #1a1a1a; margin-bottom: 12px; font-size: 0.95em; font-weight: 600;">Spouse Information</h4>
                             <div class="form-grid">
                                 <div class="form-group">
                                     <label>Spouse's Education</label>
@@ -130,7 +130,7 @@ function getEnhancedCalculatorHTML(journey) {
                         </div>
                         
                         <div class="in-progress-section" id="studyingDetails">
-                            <h4 style="color: #667eea; margin-bottom: 15px;">Current Studies</h4>
+                            <h4 style="color: #1a1a1a; margin-bottom: 12px; font-size: 0.95em; font-weight: 600;">Current Studies</h4>
                             <div class="form-grid">
                                 <div class="form-group">
                                     <label>Program you're studying</label>
@@ -198,7 +198,7 @@ function getEnhancedCalculatorHTML(journey) {
                         </div>
                         
                         <div class="in-progress-section" id="futureWorkDetails">
-                            <h4 style="color: #667eea; margin-bottom: 15px;">Future Work Experience</h4>
+                            <h4 style="color: #1a1a1a; margin-bottom: 12px; font-size: 0.95em; font-weight: 600;">Future Work Experience</h4>
                             <div class="form-grid">
                                 <div class="form-group">
                                     <label>Expected to reach 1 year by</label>
@@ -486,7 +486,7 @@ function displayEnhancedResults(scenarios, recommendations) {
     resultsDiv.classList.add('active');
     
     let html = `
-        <h3 style="text-align: center; color: #2d3748; margin: 30px 0;">Your CRS Score Timeline</h3>
+        <h3 style="text-align: center; color: #1a1a1a; margin: 1.5rem 0; font-size: 1.15em; font-weight: 600;">Your CRS Score Timeline</h3>
         
         <div class="scenario-cards">
             ${scenarios.map((scenario, index) => {
@@ -503,9 +503,9 @@ function displayEnhancedResults(scenarios, recommendations) {
                             <div class="scenario-status ${scenario.status}">
                                 ${scenario.status.charAt(0).toUpperCase() + scenario.status.slice(1)}
                             </div>
-                            ${isExcluded ? '<span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 8px;">Excluded</span>' : ''}
+                            ${isExcluded ? '<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7em; margin-left: 6px;">Excluded</span>' : ''}
                         </div>
-                        <h4 style="color: ${isExcluded ? '#9ca3af' : '#2d3748'}; margin: 10px 0;">
+                        <h4 style="color: ${isExcluded ? '#adb5bd' : '#1a1a1a'}; margin: 8px 0; font-size: 0.95em; font-weight: 600;">
                             ${scenario.icon} ${scenario.name}
                         </h4>
                         <div class="scenario-score" style="color: ${scoreColor};">
@@ -515,7 +515,7 @@ function displayEnhancedResults(scenarios, recommendations) {
                             📅 ${scenario.timeline}
                         </div>
                         ${scenario.status !== 'current' ? `
-                        <div class="scenario-actions" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+                        <div class="scenario-actions" style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #e9ecef;">
                             <div class="checkbox-group">
                                 <input type="checkbox" id="include-${index}" 
                                        class="include-checkbox" 
@@ -524,7 +524,7 @@ function displayEnhancedResults(scenarios, recommendations) {
                                        data-scenario-type="${scenario.type}"
                                        data-scenario-name="${scenario.name}"
                                        style="width: 16px; height: 16px; margin-right: 6px;">
-                                <label for="include-${index}" style="margin: 0; font-size: 0.9em; color: ${isExcluded ? '#9ca3af' : '#48bb78'}; font-weight: 500;">
+                                <label for="include-${index}" style="margin: 0; font-size: 0.8em; color: ${isExcluded ? '#adb5bd' : '#6c757d'}; font-weight: 500;">
                                     ${isExcluded ? '☐' : '✓'} Include in calculation
                                 </label>
                             </div>
@@ -535,17 +535,17 @@ function displayEnhancedResults(scenarios, recommendations) {
             }).join('')}
         </div>
 
-        <div class="chart-card" style="margin-top: 40px; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
-            <h3 style="text-align: center; color: #2d3748; margin-bottom: 20px;">Your Score vs. Past Express Entry Draws</h3>
+        <div class="chart-card" style="margin-top: 2rem; padding: 1.5rem; background: white; border-radius: 8px; border: 1px solid #e9ecef;">
+            <h3 style="text-align: center; color: #1a1a1a; margin-bottom: 1rem; font-size: 1em; font-weight: 600;">Your Score vs. Past Express Entry Draws</h3>
             <div class="chart-scroll-container" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
                 <div class="chart-inner" style="min-width: 800px; position: relative;">
                     <canvas id="crsChart"></canvas>
                 </div>
             </div>
-            <p class="chart-scroll-hint" style="display: none; text-align: center; color: #a0aec0; font-size: 0.85em; margin-top: 10px;">← Scroll to see all draws →</p>
+            <p class="chart-scroll-hint" style="display: none; text-align: center; color: #adb5bd; font-size: 0.8em; margin-top: 8px;">Scroll to see all draws</p>
         </div>
         
-        <div style="margin-top: 30px;">
+        <div style="margin-top: 1.5rem;">
             ${recommendations.map(rec => `
                 <div class="info-box ${rec.type}">
                     <h4>${rec.title}</h4>
@@ -554,12 +554,12 @@ function displayEnhancedResults(scenarios, recommendations) {
             `).join('')}
         </div>
         
-        <div class="results-actions" style="text-align: center; margin-top: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;">
-            <button onclick="exportResults()" style="padding: 14px 30px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">
-                📥 Export Results
+        <div class="results-actions" style="text-align: center; margin-top: 2rem; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px;">
+            <button onclick="exportResults()" style="padding: 10px 24px; background: #1a1a1a; color: white; border: none; border-radius: 6px; font-size: 0.9em; font-weight: 500; cursor: pointer;">
+                Export Results
             </button>
-            <button onclick="resetCalculator()" style="padding: 14px 30px; background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">
-                🔄 Start Over
+            <button onclick="resetCalculator()" style="padding: 10px 24px; background: white; color: #1a1a1a; border: 1px solid #e9ecef; border-radius: 6px; font-size: 0.9em; font-weight: 500; cursor: pointer;">
+                Start Over
             </button>
         </div>
     `;
@@ -812,7 +812,7 @@ function renderCRSChart(scenariosToCompare, hasPNP, pathwayType) {
 
     const labels = dataToDisplay.map(d => d.date);
     const data = dataToDisplay.map(d => d.crsScore);
-    const drawTypeColors = {'General': 'rgba(113, 128, 150, 0.8)', 'PNP': 'rgba(72, 187, 120, 0.8)', 'French Language': 'rgba(229, 62, 62, 0.8)', 'CEC': 'rgba(237, 137, 54, 0.8)', 'Healthcare': 'rgba(56, 178, 172, 0.8)', 'Trade': 'rgba(128, 90, 213, 0.8)', 'Education': 'rgba(49, 130, 206, 0.8)', 'Physicians': 'rgba(214, 69, 148, 0.8)', 'Senior Managers': 'rgba(159, 122, 34, 0.8)'};
+    const drawTypeColors = {'General': 'rgba(134, 142, 150, 0.7)', 'PNP': 'rgba(81, 163, 81, 0.7)', 'French Language': 'rgba(192, 57, 43, 0.7)', 'CEC': 'rgba(211, 153, 63, 0.7)', 'Healthcare': 'rgba(68, 157, 150, 0.7)', 'Trade': 'rgba(121, 99, 168, 0.7)', 'Education': 'rgba(66, 133, 183, 0.7)', 'Physicians': 'rgba(176, 82, 121, 0.7)', 'Senior Managers': 'rgba(153, 128, 58, 0.7)'};
     const colors = dataToDisplay.map(d => drawTypeColors[d.drawType]);
     const allScores = [...data, ...scenariosToCompare.map(s => s.value)];
     const maxDataValue = Math.max(...allScores.filter(s => s > 0));

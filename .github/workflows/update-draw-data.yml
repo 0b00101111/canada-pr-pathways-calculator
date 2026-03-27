@@ -25,8 +25,9 @@ jobs:
       - name: Run update script
         id: update
         run: |
-          node scripts/update-draw-data.js 2>&1 | tee output.txt
-          if grep -q "No new draws found" output.txt; then
+          OUTPUT=$(node scripts/update-draw-data.js 2>&1)
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | grep -q "No new draws found"; then
             echo "has_updates=false" >> $GITHUB_OUTPUT
           else
             echo "has_updates=true" >> $GITHUB_OUTPUT
@@ -46,3 +47,6 @@ jobs:
             Please review the new draws before merging.
           branch: automated/update-draw-data
           delete-branch: true
+          add-paths: |
+            js/draw-data.js
+            index.html
