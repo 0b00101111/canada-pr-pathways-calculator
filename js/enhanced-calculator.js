@@ -535,9 +535,14 @@ function displayEnhancedResults(scenarios, recommendations) {
             }).join('')}
         </div>
 
-        <div style="margin-top: 40px; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+        <div class="chart-card" style="margin-top: 40px; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
             <h3 style="text-align: center; color: #2d3748; margin-bottom: 20px;">Your Score vs. Past Express Entry Draws</h3>
-            <canvas id="crsChart"></canvas>
+            <div class="chart-scroll-container" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <div class="chart-inner" style="min-width: 800px; position: relative;">
+                    <canvas id="crsChart"></canvas>
+                </div>
+            </div>
+            <p class="chart-scroll-hint" style="display: none; text-align: center; color: #a0aec0; font-size: 0.85em; margin-top: 10px;">← Scroll to see all draws →</p>
         </div>
         
         <div style="margin-top: 30px;">
@@ -549,11 +554,11 @@ function displayEnhancedResults(scenarios, recommendations) {
             `).join('')}
         </div>
         
-        <div style="text-align: center; margin-top: 30px;">
-            <button onclick="exportResults()" style="padding: 14px 30px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; margin: 0 10px;">
+        <div class="results-actions" style="text-align: center; margin-top: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;">
+            <button onclick="exportResults()" style="padding: 14px 30px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">
                 📥 Export Results
             </button>
-            <button onclick="resetCalculator()" style="padding: 14px 30px; background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; margin: 0 10px;">
+            <button onclick="resetCalculator()" style="padding: 14px 30px; background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer;">
                 🔄 Start Over
             </button>
         </div>
@@ -694,9 +699,10 @@ function exportResults() {
     exportText += '   - Once you have language tests and ECA\n';
     exportText += '   - Profile valid for 12 months\n\n';
     exportText += '4. Monitor Draw Scores:\n';
-    exportText += '   - General draws: Usually 480-530\n';
-    exportText += '   - French draws: Usually 350-430\n';
-    exportText += '   - CEC draws: Usually 500-550\n\n';
+    exportText += '   - CEC draws: Usually 507-534\n';
+    exportText += '   - French draws: Usually 393-446\n';
+    exportText += '   - Healthcare draws: Usually 462-476\n';
+    exportText += '   - Note: General draws paused since April 2024\n\n';
     
     exportText += '='.repeat(55) + '\n\n';
     
@@ -806,7 +812,7 @@ function renderCRSChart(scenariosToCompare, hasPNP, pathwayType) {
 
     const labels = dataToDisplay.map(d => d.date);
     const data = dataToDisplay.map(d => d.crsScore);
-    const drawTypeColors = {'General': 'rgba(113, 128, 150, 0.8)', 'PNP': 'rgba(72, 187, 120, 0.8)', 'French Language': 'rgba(229, 62, 62, 0.8)', 'CEC': 'rgba(237, 137, 54, 0.8)'};
+    const drawTypeColors = {'General': 'rgba(113, 128, 150, 0.8)', 'PNP': 'rgba(72, 187, 120, 0.8)', 'French Language': 'rgba(229, 62, 62, 0.8)', 'CEC': 'rgba(237, 137, 54, 0.8)', 'Healthcare': 'rgba(56, 178, 172, 0.8)', 'Trade': 'rgba(128, 90, 213, 0.8)', 'Education': 'rgba(49, 130, 206, 0.8)', 'Physicians': 'rgba(214, 69, 148, 0.8)', 'Senior Managers': 'rgba(159, 122, 34, 0.8)'};
     const colors = dataToDisplay.map(d => drawTypeColors[d.drawType]);
     const allScores = [...data, ...scenariosToCompare.map(s => s.value)];
     const maxDataValue = Math.max(...allScores.filter(s => s > 0));
@@ -837,7 +843,7 @@ function renderCRSChart(scenariosToCompare, hasPNP, pathwayType) {
                 legend: { display: false }
             },
             scales: {
-                y: { beginAtZero: false, min: 350, max: yAxisMax },
+                y: { beginAtZero: false, min: Math.min(150, ...data) - 10, max: yAxisMax },
                 x: { title: { display: true, text: 'Draw Date' } }
             }
         }
