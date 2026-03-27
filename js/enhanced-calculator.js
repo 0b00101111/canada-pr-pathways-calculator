@@ -813,7 +813,8 @@ function renderCRSChart(scenariosToCompare, hasPNP, pathwayType) {
     const labels = dataToDisplay.map(d => d.date);
     const data = dataToDisplay.map(d => d.crsScore);
     const drawTypeColors = {'General': 'rgba(134, 142, 150, 0.7)', 'PNP': 'rgba(81, 163, 81, 0.7)', 'French Language': 'rgba(192, 57, 43, 0.7)', 'CEC': 'rgba(211, 153, 63, 0.7)', 'Healthcare': 'rgba(68, 157, 150, 0.7)', 'Trade': 'rgba(121, 99, 168, 0.7)', 'Education': 'rgba(66, 133, 183, 0.7)', 'Physicians': 'rgba(176, 82, 121, 0.7)', 'Senior Managers': 'rgba(153, 128, 58, 0.7)'};
-    const colors = dataToDisplay.map(d => drawTypeColors[d.drawType]);
+    const DEFAULT_DRAW_TYPE = 'General';
+    const colors = dataToDisplay.map(d => drawTypeColors[d.drawType] || drawTypeColors[DEFAULT_DRAW_TYPE]);
     const allScores = [...data, ...scenariosToCompare.map(s => s.value)];
     const maxDataValue = Math.max(...allScores.filter(s => s > 0));
     const yAxisMax = isFinite(maxDataValue) ? Math.ceil((maxDataValue + 20) / 10) * 10 : 600;
