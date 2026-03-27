@@ -1127,6 +1127,73 @@
             }
         }
         
+        /* Recent draws table */
+        .recent-draws-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+        .recent-draws-table th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .recent-draws-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #edf2f7;
+            color: #2d3748;
+        }
+        .recent-draws-table tr:last-child td {
+            border-bottom: none;
+        }
+        .recent-draws-table tr:hover td {
+            background: #f7fafc;
+        }
+        .draw-type-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.82em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .draw-type-badge.cec { background: #feebc8; color: #c05621; }
+        .draw-type-badge.french { background: #fed7d7; color: #c53030; }
+        .draw-type-badge.pnp { background: #c6f6d5; color: #276749; }
+        .draw-type-badge.healthcare { background: #b2f5ea; color: #285e61; }
+        .draw-type-badge.general { background: #e2e8f0; color: #4a5568; }
+        .draw-type-badge.trade { background: #e9d8fd; color: #553c9a; }
+        .draw-type-badge.education { background: #bee3f8; color: #2b6cb0; }
+        .draw-type-badge.physicians { background: #fed7e2; color: #97266d; }
+        .draw-type-badge.senior-managers { background: #fefcbf; color: #975a16; }
+        .crs-score-cell {
+            font-weight: 700;
+            font-size: 1.05em;
+        }
+
+        @media (max-width: 768px) {
+            .recent-draws-section {
+                padding: 20px 15px !important;
+            }
+            .recent-draws-table {
+                font-size: 0.85em;
+            }
+            .recent-draws-table th,
+            .recent-draws-table td {
+                padding: 8px 6px;
+            }
+            .draw-type-badge {
+                font-size: 0.75em;
+                padding: 2px 7px;
+            }
+        }
+
         /* Smooth scrolling for better mobile experience */
         html {
             scroll-behavior: smooth;
@@ -1178,6 +1245,16 @@
                 <p>This calculator focuses on the <strong>Express Entry system</strong>, the main pathway for skilled workers. For a broader look at all immigration options, check out the overview on the Resources tab. Remember to always consult official IRCC resources for the most accurate information.</p>
             </div>
             
+            <!-- Recent Express Entry Draws -->
+            <div id="recentDrawsSection" class="recent-draws-section" style="background: white; border-radius: 20px; padding: 30px; margin: 30px 0; box-shadow: 0 5px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                <h2 style="color: #2d3748; margin: 0 0 8px; font-size: 1.5em; text-align: center;">Recent Express Entry Draws</h2>
+                <p style="color: #718096; text-align: center; margin: 0 0 20px; font-size: 0.95em;">Latest invitation rounds from IRCC</p>
+                <div id="recentDrawsTable"></div>
+                <p style="text-align: center; margin: 15px 0 0; font-size: 0.85em; color: #a0aec0;">
+                    Source: <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/rounds-invitations.html" target="_blank" style="color: #667eea;">IRCC Rounds of Invitations</a>
+                </p>
+            </div>
+
             <!-- Real Example Showcase - MOVED TO TOP -->
             <div style="background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%); border-radius: 20px; padding: 40px; margin: 40px 0; border: 2px solid #e2e8f0;">
                 <h3 style="color: #2d3748; margin-bottom: 20px; font-size: 1.8em; text-align: center;">🌟 See How Sam Discovered His Best Immigration Strategy</h3>
@@ -1704,6 +1781,33 @@
                 console.log('All calculator modules loaded and ready');
             }
         });
+
+        // Populate recent draws table on the Learn page
+        function renderRecentDrawsTable() {
+            if (typeof historicalDrawData === 'undefined') return;
+            const container = document.getElementById('recentDrawsTable');
+            if (!container) return;
+
+            const recent = historicalDrawData.slice(-12).reverse();
+            const badgeClass = (type) => {
+                const map = {'CEC':'cec','French Language':'french','PNP':'pnp','Healthcare':'healthcare','General':'general','Trade':'trade','Education':'education','Physicians':'physicians','Senior Managers':'senior-managers'};
+                return map[type] || 'general';
+            };
+            const formatDate = (d) => {
+                const dt = new Date(d + 'T00:00:00');
+                return dt.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+            };
+
+            container.innerHTML = `<table class="recent-draws-table">
+                <thead><tr><th>Date</th><th>Category</th><th>CRS Score</th></tr></thead>
+                <tbody>${recent.map(d => `<tr>
+                    <td>${formatDate(d.date)}</td>
+                    <td><span class="draw-type-badge ${badgeClass(d.drawType)}">${d.drawType}</span></td>
+                    <td class="crs-score-cell">${d.crsScore}</td>
+                </tr>`).join('')}</tbody>
+            </table>`;
+        }
+        window.addEventListener('DOMContentLoaded', renderRecentDrawsTable);
 
         // Toggle for new pathway details section
         function toggleDetails(button, detailsId) {
