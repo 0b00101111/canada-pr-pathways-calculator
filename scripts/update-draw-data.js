@@ -81,12 +81,13 @@ async function main() {
     console.log('Fetching latest draw data from IRCC...');
     const json = await fetchJSON(IRCC_JSON_URL);
 
-    // The JSON structure has a "rounds" array
-    const rounds = json.rounds || json;
-    if (!Array.isArray(rounds)) {
+    // The JSON structure is { rounds: { r405: {...}, r404: {...}, ... } }
+    const roundsObj = json.rounds;
+    if (!roundsObj || typeof roundsObj !== 'object') {
         console.error('Unexpected JSON structure. Top-level keys:', Object.keys(json));
         process.exit(1);
     }
+    const rounds = Object.values(roundsObj);
 
     console.log(`Found ${rounds.length} draws from IRCC.`);
 
