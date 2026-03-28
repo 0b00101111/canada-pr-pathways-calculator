@@ -989,6 +989,35 @@
             }
         }
         
+        /* Recent draws filter tabs */
+        .draws-filter-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .draws-filter-tab {
+            padding: 4px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: none;
+            color: var(--text-secondary);
+            font-size: 0.8em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .draws-filter-tab:hover {
+            border-color: #d0d5dd;
+            color: var(--text-primary);
+        }
+        .draws-filter-tab.active {
+            background: var(--text-primary);
+            color: white;
+            border-color: var(--text-primary);
+        }
+
         /* Recent draws table */
         .recent-draws-table {
             width: 100%;
@@ -1103,6 +1132,7 @@
             <div id="recentDrawsSection" class="recent-draws-section" style="background: white; border-radius: 8px; padding: 1.5rem; margin: 2rem 0; border: 1px solid #e9ecef;">
                 <h2 style="color: #1a1a1a; margin: 0 0 4px; font-size: 1.15em; font-weight: 600; text-align: center;">Recent Express Entry Draws</h2>
                 <p style="color: #adb5bd; text-align: center; margin: 0 0 1rem; font-size: 0.85em;">Latest invitation rounds from IRCC</p>
+                <div id="recentDrawsFilters"></div>
                 <div id="recentDrawsTable"></div>
                 <p style="text-align: center; margin: 12px 0 0; font-size: 0.8em; color: #adb5bd;">
                     Source: <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/rounds-invitations.html" target="_blank" style="color: #6c757d;">IRCC Rounds of Invitations</a>
@@ -1637,12 +1667,14 @@
         });
 
         // Populate recent draws table on the Learn page
-        function renderRecentDrawsTable() {
+        function renderRecentDrawsTable(filter) {
             if (typeof historicalDrawData === 'undefined') return;
             const container = document.getElementById('recentDrawsTable');
+            const filtersContainer = document.getElementById('recentDrawsFilters');
             if (!container) return;
 
-            const recent = historicalDrawData.slice(-12).reverse();
+            filter = filter || 'All';
+
             const badgeClass = (type) => {
                 const map = {'CEC':'cec','French Language':'french','PNP':'pnp','Healthcare':'healthcare','General':'general','Trade':'trade','Education':'education','Physicians':'physicians','Senior Managers':'senior-managers'};
                 return map[type] || 'general';
@@ -1651,6 +1683,29 @@
                 const dt = new Date(d + 'T00:00:00');
                 return dt.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
             };
+
+            // Get unique categories from data
+            const categories = [...new Set(historicalDrawData.map(d => d.drawType))];
+
+            // Render filter tabs
+            if (filtersContainer) {
+                const tabs = ['All', ...categories].map(cat =>
+                    `<button class="draws-filter-tab ${cat === filter ? 'active' : ''}" onclick="renderRecentDrawsTable('${cat}')">${cat}</button>`
+                ).join('');
+                filtersContainer.innerHTML = `<div class="draws-filter-tabs">${tabs}</div>`;
+            }
+
+            // Filter and limit data
+            let filtered = historicalDrawData;
+            if (filter !== 'All') {
+                filtered = filtered.filter(d => d.drawType === filter);
+            }
+            const recent = filtered.slice(-15).reverse();
+
+            if (recent.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: #adb5bd; padding: 1rem; font-size: 0.9em;">No draws found for this category.</p>`;
+                return;
+            }
 
             container.innerHTML = `<table class="recent-draws-table">
                 <thead><tr><th>Date</th><th>Category</th><th>CRS Score</th></tr></thead>
