@@ -408,5 +408,6 @@ const historicalDrawData = [
     { date: "2025-05-02", crsScore: 510, drawType: "Healthcare" },
     { date: "2025-06-04", crsScore: 504, drawType: "Healthcare" },
     { date: "2025-07-22", crsScore: 475, drawType: "Healthcare" },
-    { date: "2026-03-30", crsScore: 802, drawType: "PNP" }
+    { date: "2026-03-30", crsScore: 802, drawType: "PNP" },
+    { date: "2026-03-31", crsScore: 509, drawType: "CEC" }
 ];
