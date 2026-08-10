@@ -432,5 +432,9 @@ const historicalDrawData = [
     { date: "2026-07-20", crsScore: 744, drawType: "PNP" },
     { date: "2026-07-21", crsScore: 516, drawType: "CEC" },
     { date: "2026-07-22", crsScore: 399, drawType: "French Language" },
-    { date: "2026-07-23", crsScore: 368, drawType: "Military" }
+    { date: "2026-07-23", crsScore: 368, drawType: "Military" },
+    { date: "2026-08-04", crsScore: 768, drawType: "PNP" },
+    { date: "2026-08-05", crsScore: 516, drawType: "CEC" },
+    { date: "2026-08-06", crsScore: 391, drawType: "French Language" },
+    { date: "2026-08-07", crsScore: 470, drawType: "Transport" }
 ];
