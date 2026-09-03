@@ -440,5 +440,7 @@ const historicalDrawData = [
     { date: "2026-08-17", crsScore: 760, drawType: "PNP" },
     { date: "2026-08-18", crsScore: 523, drawType: "CEC" },
     { date: "2026-08-19", crsScore: 382, drawType: "French Language" },
-    { date: "2026-08-31", crsScore: 697, drawType: "PNP" }
+    { date: "2026-08-31", crsScore: 697, drawType: "PNP" },
+    { date: "2026-09-01", crsScore: 521, drawType: "CEC" },
+    { date: "2026-09-03", crsScore: 198, drawType: "Physicians" }
 ];
